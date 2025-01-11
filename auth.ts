@@ -5,8 +5,11 @@ import Credentials from 'next-auth/providers/credentials';
 import { SignInSchema } from './lib/zod';
 import { compareSync } from 'bcrypt-ts';
 
+import type { Adapter } from 'next-auth/adapters';
+
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  adapter: PrismaAdapter(prisma),
+  adapter: PrismaAdapter(prisma) as Adapter,
   session: { strategy: 'jwt' },
   pages: {
     signIn: '/login',
