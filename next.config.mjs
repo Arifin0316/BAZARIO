@@ -5,6 +5,10 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'lh3.googleusercontent.com'  // Hapus tanda kutip ganda ekstra
+      },
+      {
+        protocol: 'https',
+        hostname: 'avatars.githubusercontent.com'  // Hapus tanda kutip ganda ekstra
       }
     ]
   }
