@@ -38,7 +38,7 @@ const Navbar = async () => {
                 <span className="font-xs text-gray-400 text-right capitalize">{sessent.user.role}</span>
               </div>
               <button type="button">
-                <Image src={sessent.user.image || '/avatar.svg'} alt="avatar" width={64} height={64} className="w-8 h-8" />
+                <Image src={sessent.user.image || '/avatar.svg'} alt="avatar" width={64} height={64} className="w-8 h-8 rounded-full" />
               </button>
             </div>
           )}

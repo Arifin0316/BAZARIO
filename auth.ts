@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import Credentials from 'next-auth/providers/credentials';
 import { SignInSchema } from './lib/zod';
 import { compareSync } from 'bcrypt-ts';
+import Google from 'next-auth/providers/google';
 
 import type { Adapter } from 'next-auth/adapters';
 
@@ -15,6 +16,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     signIn: '/login',
   },
   providers: [
+    Google({
+      clientId: process.env.AUTH_GOOGLE_ID!,
+      clientSecret: process.env.AUTH_GOOGLE_SECRET!,
+    }),
     Credentials({
       credentials: {
         name: {},
