@@ -5,6 +5,7 @@ import Credentials from 'next-auth/providers/credentials';
 import { SignInSchema } from './lib/zod';
 import { compareSync } from 'bcrypt-ts';
 import Google from 'next-auth/providers/google';
+import Github from 'next-auth/providers/github';
 
 import type { Adapter } from 'next-auth/adapters';
 
@@ -19,6 +20,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     Google({
       clientId: process.env.AUTH_GOOGLE_ID!,
       clientSecret: process.env.AUTH_GOOGLE_SECRET!,
+    }),
+    Github({
+      clientId: process.env.AUTH_GITHUB_ID!,
+      clientSecret: process.env.AUTH_GITHUB_SECRET!,
     }),
     Credentials({
       credentials: {

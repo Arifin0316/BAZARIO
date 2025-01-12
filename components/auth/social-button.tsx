@@ -1,6 +1,6 @@
 'use client';
 import { IoLogoGithub, IoLogoGoogle } from "react-icons/io5";
-import { startGoogleSignIn } from "@/app/actions/auth";
+import { startGoogleSignIn, startGithubSignIn } from "@/app/actions/auth";
 
 export const GoogleButton = () => {
   return (
@@ -17,7 +17,7 @@ export const GoogleButton = () => {
 export const GihubButton = () => {
   return (
     <button 
-      onClick={() => startGoogleSignIn()}
+      onClick={() => startGithubSignIn()}
       className="flex items-center justify-center w-full p-2 space-x-2 text-white bg-gray-500 rounded-lg hover:bg-gray-600 transition-colors"
     >
       <IoLogoGithub />
