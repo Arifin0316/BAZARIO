@@ -3,7 +3,7 @@ import { GetUser } from "@/lib/data";
 const UserTable = async () => {
     const users = await GetUser();
     if(!users?.length) return <h1 className="text-2xl">no user found</h1>
-    return ( 
+    return (
         <table className="w-full bg-white mt-3">
             <thead className="border-b border-green-100">
                 <tr>
@@ -23,7 +23,7 @@ const UserTable = async () => {
                 
             </tbody>
         </table>
-     );
+    );
 }
- 
+
 export default UserTable;

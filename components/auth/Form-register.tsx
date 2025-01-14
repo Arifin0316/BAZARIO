@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { SignUpCredential } from '@/lib/action';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 const FormRegister = () => {
   const [state, setState] = useState<{ errors?: Record<string, string>; message?: string }>({});
@@ -28,48 +30,54 @@ const FormRegister = () => {
         </div>
       )}
 
-      <div>
-        <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900">
-          Name
-        </label>
-        <input id="name" name="name" type="text" placeholder="Name" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
-        <span className="text-sm text-red-500 mt-2">{state.errors?.name || ''}</span>
-      </div>
+      <Input
+        id="name"
+        name="name"
+        type="text"
+        label="Name"
+        required
+        placeholder="Name"
+        error={state.errors?.name}
+      />
 
-      <div>
-        <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900">
-          Email
-        </label>
-        <input id="email" name="email" type="email" placeholder="example@gmail.com" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
-        <span className="text-sm text-red-500 mt-2">{state.errors?.email || ''}</span>
-      </div>
+      <Input
+        id="email"
+        name="email"
+        type="email"
+        label="Email"
+        required
+        placeholder="example@gmail.com"
+        error={state.errors?.email}
+      />
 
-      <div>
-        <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900">
-          Password
-        </label>
-        <input id="password" name="password" type="password" placeholder="*******" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
-        <span className="text-sm text-red-500 mt-2">{state.errors?.password || ''}</span>
-      </div>
+      <Input
+        id="password"
+        name="password"
+        type="password"
+        label="Password"
+        required
+        placeholder="*******"
+        error={state.errors?.password}
+      />
 
-      <div>
-        <label htmlFor="confirmPassword" className="block mb-2 text-sm font-medium text-gray-900">
-          Confirm Password
-        </label>
-        <input id="confirmPassword" name="confirmPassword" type="password" placeholder="*******" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" />
-        <span className="text-sm text-red-500 mt-2">{state.errors?.confirmPassword || ''}</span>
-      </div>
+      <Input
+        id="confirmPassword"
+        name="confirmPassword"
+        type="password"
+        label="Confirm Password"
+        required
+        placeholder="*******"
+        error={state.errors?.confirmPassword}
+      />
 
-      <button
+      <Button
         type="submit"
-        disabled={loading}
-        className={`relative flex justify-center items-center w-full py-2 px-4 rounded-lg uppercase bg-blue-500 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all ${
-          loading ? 'opacity-70 cursor-not-allowed' : ''
-        }`}
+        loading={loading}
+        loadingText="Loading..."
+        fullWidth
       >
-        {loading && <span className="loader mr-4 w-4 h-4"></span>}
-        <span>{loading ? 'Loading...' : 'Register'}</span>
-      </button>
+        Register
+      </Button>
 
       <div className="text-sm font-light text-gray-500 mt-4">
         Already have an account?{' '}

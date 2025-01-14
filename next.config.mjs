@@ -8,7 +8,15 @@ const nextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'avatars.githubusercontent.com'  // Hapus tanda kutip ganda ekstra
+        hostname: 'avatars.githubusercontent.com'
+      },
+      {
+        protocol: 'https',
+        hostname: '"www.static-src.com"'
+      },
+      {
+        protocol: 'https',
+        hostname: '"res.cloudinary.com"'
       }
     ]
   }

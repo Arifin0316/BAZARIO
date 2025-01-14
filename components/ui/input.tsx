@@ -1,78 +1,55 @@
-import React, { InputHTMLAttributes, ChangeEvent } from "react";
+// components/Input.tsx
+import { InputHTMLAttributes, forwardRef } from 'react';
 
-interface FormInputProps
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, "onChange"> {
+interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
-  name: string;
-  type?:
-    | "text"
-    | "email"
-    | "password"
-    | "number"
-    | "tel"
-    | "url"
-    | "search"
-    | "date";
-  value?: string | number;
-  onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
-  placeholder?: string;
-  errorMessage?: string | undefined;
-  required?: boolean;
-  className?: string;
+  error?: string;
+  containerClassName?: string;
+  labelClassName?: string;
+  inputClassName?: string;
+  errorClassName?: string;
 }
 
-const FormInput: React.FC<FormInputProps> = ({
+export const Input = forwardRef<HTMLInputElement, InputProps>(({
   label,
-  name,
-  type = "text",
-  value,
-  onChange,
-  placeholder = "",
-  errorMessage = "",
-  required = false,
-  className = "",
+  error,
+  containerClassName = 'space-y-2',
+  labelClassName = 'block text-sm font-medium text-gray-900',
+  inputClassName = 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5',
+  errorClassName = 'text-sm text-red-500',
+  id,
   ...props
-}) => {
-  const inputId = `${name}-input`;
-  const errorId = `${name}-error`;
+}, ref) => {
+  // Tambahkan style untuk error state
+  const inputStyle = error 
+    ? `${inputClassName} border-red-500 focus:ring-red-500 focus:border-red-500`
+    : inputClassName;
 
   return (
-    <div className="mb-4">
+    <div className={containerClassName}>
       {label && (
-        <label
-          htmlFor={inputId}
-          className="block mb-2 text-sm font-medium text-gray-900"
+        <label 
+          htmlFor={id} 
+          className={labelClassName}
         >
           {label}
         </label>
       )}
+      
       <input
-        type={type}
-        name={name}
-        id={inputId}
-        value={value ?? ""}
-        onChange={onChange}
-        placeholder={placeholder}
-        className={`bg-gray-50 border ${
-          errorMessage ? "border-red-500" : "border-gray-300"
-        } text-gray-900 rounded-lg w-full p-2.5 focus:ring-blue-500 focus:border-blue-500 ${className}`}
-        required={required}
-        aria-invalid={!!errorMessage}
-        aria-describedby={errorMessage ? errorId : undefined}
-        readOnly={!onChange} // Handle read-only fields
+        ref={ref}
+        id={id}
+        className={inputStyle}
         {...props}
       />
-      {errorMessage && (
-        <span
-          id={errorId}
-          className="text-sm text-red-500 mt-1"
-          aria-live="polite"
-        >
-          {errorMessage}
+      
+      {error && (
+        <span className={errorClassName}>
+          {error}
         </span>
       )}
     </div>
   );
-};
+});
 
-export default FormInput;
+Input.displayName = 'Input';

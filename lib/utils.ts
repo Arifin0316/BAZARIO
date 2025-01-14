@@ -5,3 +5,14 @@ export const formatDate = (dateStr: string) => {
   } );
   return formater.format(date);
 }
+
+export const formatPrice = (amount: number) => {
+  const formater = new Intl.NumberFormat("id-ID", {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 0, // Menghindari angka desimal
+    maximumFractionDigits: 0
+  });
+  return formater.format(amount);
+};
+
