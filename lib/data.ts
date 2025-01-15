@@ -51,11 +51,6 @@ export const GetProdakByUser = async() => {
 
 export async function uploadImageToCloudinary(base64Image: string) {
     try {
-        console.log('Cloudinary Config:', {
-            cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-            api_key: process.env.CLOUDINARY_API_KEY ? 'Set' : 'Not Set',
-            api_secret: process.env.CLOUDINARY_API_SECRET ? 'Set' : 'Not Set'
-        });
 
         const base64Data = base64Image.replace(/^data:image\/\w+;base64,/, '');
         const result = await cloudinary.uploader.upload(`data:image/png;base64,${base64Data}`, {
@@ -67,7 +62,7 @@ export async function uploadImageToCloudinary(base64Image: string) {
         if (error instanceof Error) {
             throw new Error(`Failed to upload image: ${error.message}`);
         } else {
-            throw new Error('Failed to upload image: Unknown error');
+            throw new Error('Failed to upload image');
         }
     }
 }
