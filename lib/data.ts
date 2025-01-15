@@ -51,13 +51,21 @@ export const GetProdakByUser = async() => {
 
 export async function uploadImageToCloudinary(base64Image: string) {
     try {
-        const result = await cloudinary.uploader.upload(base64Image, {
-            folder: 'prodak', 
+        const base64Data = base64Image.replace(/^data:image\/\w+;base64,/, '');
+        console.log('Attempting to upload image to Cloudinary...');
+        
+        const result = await cloudinary.uploader.upload(`data:image/png;base64,${base64Data}`, {
+            folder: 'prodak',
         });
+        console.log('Upload successful:', result);
         return result.secure_url;
     } catch (error) {
-        console.error('Error details:', error);
-        throw new Error('Failed to upload image');
+        console.error('Detailed upload error:', error);
+        if (error instanceof Error) {
+            throw new Error(`Failed to upload image: ${error.message}`);
+        } else {
+            throw new Error('Failed to upload image: Unknown error');
+        }
     }
 }
 

@@ -27,7 +27,7 @@ export default async function Page({ params }: Props) {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto">
       <Suspense fallback={<div>Loading...</div>}>
         <EditProdakForm initialProduct={product} />
       </Suspense>
