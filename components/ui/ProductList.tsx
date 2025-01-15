@@ -5,22 +5,29 @@ import { GetProdakByUser, deleteProdakAction } from "@/lib/data";
 import { ProductCard } from './ProductCard';
 import { Pagination } from './Pagination';
 import { ProdakInterface } from '@/types';
+import ProductListSkeleton from '@/components/sceleton/ProductListSkeleton';
 
 
 const ProductList = () => {
    
     const [prodaks, setProdaks] = useState<ProdakInterface[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
+    const [isLoading, setIsLoading] = useState(true);
     const productsPerPage = 5;
 
     useEffect(() => {
         const fetchProdaks = async () => {
             const data = await GetProdakByUser();
             setProdaks(data as ProdakInterface[]);
+            setIsLoading(false);
         };
 
         fetchProdaks();
     }, []);
+
+    if (isLoading) {
+        return <ProductListSkeleton />;
+      }
 
     const handleDelete = async (id: string) => {
         const result = await deleteProdakAction(id);

@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import cloudinary from "@/lib/cloudinary";
+import { z } from 'zod';
 
 
 export const GetUser = async() => {
@@ -140,11 +141,13 @@ export async function deleteProdakAction(id: string) {
     }
 }
 
-export async function deleteUserAction(id: string) {
+
+export async function deleteUserAction(formData: FormData) {
+    const id = formData.get('id') as string;
     const session = await auth();
     
     if (!session?.user || session.user.role !== "admin") {
-        return { success: false, error: "Unauthorized" };
+        throw new Error("Unauthorized");
     }
 
     try {
@@ -153,23 +156,49 @@ export async function deleteUserAction(id: string) {
         });
 
         if (!user) {
-            return { success: false, error: "User not found" };
+            throw new Error("User not found");
         }
 
         await prisma.user.delete({
             where: { id },
         });
 
-        return { success: true };
     } catch (error) {
         console.error('Error deleting user:', error);
-        return { 
-            success: false, 
-            error: error instanceof Error ? error.message : "Failed to delete user" 
-        };
+        throw error;
     }
 }
 
+export async function updateUserRoleAction(formData: FormData) {
+    const session = await auth();
+    
+    if (!session?.user || session.user.role !== "admin") {
+        throw new Error("Unauthorized");
+    }
+
+    const userId = formData.get('userId') as string;
+    const newRole = formData.get('role') as string;
+
+    const schema = z.object({
+        userId: z.string().min(1, "User ID is required"),
+        role: z.enum(["user", "admin"], {
+            errorMap: () => ({ message: "Invalid role" })
+        })
+    });
+
+    try {
+        const validatedData = schema.parse({ userId, role: newRole });
+
+        await prisma.user.update({
+            where: { id: validatedData.userId },
+            data: { role: validatedData.role }
+        });
+
+    } catch (error) {
+        console.error('Error updating user role:', error);
+        throw error;
+    }
+}
 export async function GetProdakById(id: string) {
     const session = await auth();
     

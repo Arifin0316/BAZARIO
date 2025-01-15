@@ -11,7 +11,7 @@ export const ActionButtons = ({ onEdit, onDelete }: ActionButtonsProps) => (
           className="px-4 py-1.5 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition-colors duration-200"
            
       >
-        <Link href={`/cek/${onEdit}`}>
+        <Link href={`/prodak/edit/${onEdit}`}>
           Edit
         </Link>
          
