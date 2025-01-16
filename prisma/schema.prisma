@@ -36,20 +36,7 @@ model Session {
   @@map("sessions")
 }
 
-model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime? @map("email_verified")
-  image         String?
-  password      String?
-  role          String    @default("user")
-  Prodak        Prodak[]
-  accounts      Account[]
-  sessions      Session[]
 
-  @@map("users")
-}
 
 model VerificationToken {
   identifier String
@@ -66,17 +53,159 @@ model Category {
   prodaks Prodak[]
 }
 
+model Order {
+  id              String      @id @default(cuid())
+  userId          String
+  totalAmount     Int
+  status          OrderStatus @default(PENDING)
+  paymentStatus   PaymentStatus @default(UNPAID)
+  shippingAddress String
+  phoneNumber     String
+  notes           String?     // Catatan dari pembeli
+  trackingNumber  String?     // Nomor resi pengiriman
+  shippingMethod  String?     // Metode pengiriman
+  shippingCost    Int?        // Biaya pengiriman
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  orderItems      OrderItem[]
+  user            User        @relation(fields: [userId], references: [id])
+  payment         Payment?
+
+  @@map("orders")
+}
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  prodakId  String
+  quantity  Int
+  price     Int
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  prodak    Prodak  @relation(fields: [prodakId], references: [id])
+
+  @@map("order_items")
+}
+
+
+
+model Payment {
+  id                String        @id @default(cuid())
+  orderId          String        @unique
+  amount           Int
+  status           PaymentStatus @default(PENDING)
+  paymentMethod    PaymentMethod
+  paymentProof     String?       // For manual transfer
+  midtransToken    String?       // Midtrans snap token
+  midtransOrderId  String?       // Midtrans order ID
+  transactionId    String?       // ID transaksi dari payment gateway
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  order            Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("payments")
+}
+
+model Cart {
+  id        String     @id @default(cuid())
+  userId    String     @unique
+  items     CartItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("carts")
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  cartId    String
+  prodakId  String
+  quantity  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  prodak    Prodak   @relation(fields: [prodakId], references: [id])
+
+  @@map("cart_items")
+}
+
+// Update User model
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime? @map("email_verified")
+  image         String?
+  password      String?
+  role          String    @default("user")
+  address       String?
+  phoneNumber   String?
+  Prodak        Prodak[]
+  accounts      Account[]
+  sessions      Session[]
+  orders        Order[]
+  cart          Cart?
+  reviews       Review[]
+
+  @@map("users")
+}
+
+// Update Prodak model
 model Prodak {
-  id          String    @id @default(cuid())
+  id          String      @id @default(cuid())
   name        String
   price       Int
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
   userId      String
   categoryId  String?
   description String?
   image       String?
-  stock       Int       @default(0)
-  category    Category? @relation(fields: [categoryId], references: [id])
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stock       Int         @default(0)
+  category    Category?   @relation(fields: [categoryId], references: [id])
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orderItems  OrderItem[]
+  cartItems   CartItem[]
+  reviews     Review[]
+
+  @@map("prodaks")
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  rating    Int      @default(0)
+  comment   String?
+  userId    String
+  prodakId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  prodak    Prodak   @relation(fields: [prodakId], references: [id], onDelete: Cascade)
+
+  @@map("reviews")
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  UNPAID
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  BANK_TRANSFER
+  E_WALLET
+  CREDIT_CARD
+  VIRTUAL_ACCOUNT
+  GOPAY
+  SHOPEEPAY
+  QRIS
 }

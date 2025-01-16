@@ -10,7 +10,8 @@ interface ProductCardProps {
     onDelete: (id: string) => void;
 }
 
-export const ProductCard = ({ product, onEdit, onDelete }: ProductCardProps) => (
+export const ProductCard = ({ product, onEdit, onDelete }: ProductCardProps) => {
+     return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex">
         <ProductImage image={product.image} name={product.name} />
         
@@ -20,6 +21,7 @@ export const ProductCard = ({ product, onEdit, onDelete }: ProductCardProps) => 
                     <h2 className="text-lg font-semibold text-gray-800">{product.name}</h2>
                     <p className="text-sm text-gray-600">Created by: {product.user.name || 'Unknown'}</p>
                     <p className="text-sm text-gray-600">Created at: {formatDate(product.createdAt.toString())}</p>
+                    <p className="text-sm text-gray-600">Catagory: {product.category?.name}</p>
                 </div>
                 <StockBadge stock={product.stock} />
             </div>
@@ -32,7 +34,8 @@ export const ProductCard = ({ product, onEdit, onDelete }: ProductCardProps) => 
                 <span className="text-green-600 font-semibold">
                     {formatPrice(product.price)}
                 </span>
+              
             </div>
         </div>
     </div>
-);
+)};

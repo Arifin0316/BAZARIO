@@ -2,10 +2,14 @@
 
 import { FormEvent, useState } from 'react';
 import { useTransition } from 'react';
-import { updateUserRoleAction } from "@/lib/data";
-import { deleteUserAction } from "@/lib/data";
-import DeleteConfirmationModal from '../modals/DeleteConfirmationModal';
+import { updateUserRoleAction, deleteUserAction } from "@/lib/data";
+import ConfirmationModal from '../modals/ConfirmationModal';
+import { Pagination } from '@/components/ui/Pagination';
 import Swal from 'sweetalert2';
+import UserTableRow from './UserTableRow';
+import UserTableHeader from './UserTableHeader';
+
+const ITEMS_PER_PAGE = 10;
 
 interface User {
     id: string;
@@ -19,11 +23,17 @@ interface UserTableProps {
 }
 
 const UserTable = ({ initialUsers }: UserTableProps) => {
-    const [users, setUsers] = useState(initialUsers);
+    const [users, setUsers] = useState<User[]>(initialUsers);
     const [isPending, startTransition] = useTransition();
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [userToDelete, setUserToDelete] = useState<string | null>(null);
+    const [currentPage, setCurrentPage] = useState(1);
 
+    // Calculate pagination
+    const totalPages = Math.ceil(users.length / ITEMS_PER_PAGE);
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    const currentUsers = users.slice(startIndex, endIndex);
 
     const handleUpdateRole = async (event: FormEvent<HTMLFormElement>, userId: string) => {
         event.preventDefault();
@@ -45,38 +55,37 @@ const UserTable = ({ initialUsers }: UserTableProps) => {
                     icon: 'success',
                     title: 'Role pengguna berhasil diupdate',
                     showConfirmButton: false,
-                    timer: 1000,
-                    toast: true,
-                    customClass: {
-                        popup: 'colored-toast'
-                    }
+                    timer: 1500,
+                    toast: true
                 });
             } catch (error) {
                 console.error('Error updating user role:', error);
+                // Rollback on error
                 setUsers(prevUsers => 
                     prevUsers.map(user => 
-                        user.id === userId ? {...user, role: user.role} : user
+                        user.id === userId 
+                            ? {...user, role: initialUsers.find(u => u.id === userId)?.role || user.role}
+                            : user
                     )
                 );
-                // You might want to show an error message to the user here
                 Swal.fire({
                     position: 'top',
                     icon: 'error',
                     title: 'Gagal mengupdate role pengguna',
                     showConfirmButton: false,
-                    timer: 1000,
-                    toast: true,
-                    customClass: {
-                        popup: 'colored-toast'
-                    }
+                    timer: 1500,
+                    toast: true
                 });
             }
         });
     };
 
     const openDeleteModal = (userId: string) => {
-        setUserToDelete(userId);
-        setIsDeleteModalOpen(true);
+        const userToDeleteData = users.find(user => user.id === userId);
+        if (userToDeleteData) {
+            setUserToDelete(userId);
+            setIsDeleteModalOpen(true);
+        }
     };
 
     const closeDeleteModal = () => {
@@ -84,7 +93,7 @@ const UserTable = ({ initialUsers }: UserTableProps) => {
         setIsDeleteModalOpen(false);
     };
 
-    const confirmDelete = async () => {
+    const handleDelete = async () => {
         if (!userToDelete) return;
 
         const formData = new FormData();
@@ -97,94 +106,83 @@ const UserTable = ({ initialUsers }: UserTableProps) => {
             try {
                 await deleteUserAction(formData);
                 Swal.fire({
-                    title: 'Berhasil!',
-                    text: 'Pengguna berhasil dihapus',
+                    position: 'top',
                     icon: 'success',
-                    confirmButtonText: 'OK'
+                    title: 'Pengguna berhasil dihapus',
+                    showConfirmButton: false,
+                    timer: 1500,
+                    toast: true
                 });
             } catch (error) {
                 console.error('Error deleting user:', error);
-                // Revert the optimistic update on error
+                // Rollback on error
                 const deletedUser = initialUsers.find(user => user.id === userToDelete);
                 if (deletedUser) {
                     setUsers(prevUsers => [...prevUsers, deletedUser]);
                 }
-                // You might want to show an error message to the user here
                 Swal.fire({
-                    title: 'Error!',
-                    text: 'Gagal menghapus pengguna',
+                    position: 'top',
                     icon: 'error',
-                    confirmButtonText: 'OK'
+                    title: 'Gagal menghapus pengguna',
+                    showConfirmButton: false,
+                    timer: 1500,
+                    toast: true
                 });
+            } finally {
+                closeDeleteModal();
             }
         });
-
-        closeDeleteModal();
     };
 
-    if(!users?.length) return <h1 className="text-2xl">No users found</h1>
+    if(!users?.length) {
+        return (
+            <div className="flex justify-center items-center min-h-[200px]">
+                <h1 className="text-2xl text-gray-500 font-medium">No users found</h1>
+            </div>
+        );
+    }
     
     return (
-        <>
-            <table className="w-full bg-white mt-3">
-                <thead className="border-b border-green-100">
-                    <tr>
-                        <th className="py-3 px-6 text-left text-sm">Name</th>
-                        <th className="py-3 px-6 text-left text-sm">Email</th>
-                        <th className="py-3 px-6 text-left text-sm">Role</th>
-                        <th className="py-3 px-6 text-left text-sm">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {users.map((user) => (
-                        <tr key={user.id} className="hover:bg-gray-50">
-                            <td className="py-3 px-6">{user.name}</td>
-                            <td className="py-3 px-6">{user.email}</td>
-                            <td className="py-3 px-6">
-                                <form onSubmit={(e) => handleUpdateRole(e, user.id)}>
-                                    <input 
-                                        type="hidden" 
-                                        name="userId" 
-                                        value={user.id} 
-                                    />
-                                    <select 
-                                        name="role"
-                                        defaultValue={user.role}
-                                        className="w-full p-1 border rounded"
-                                    >
-                                        <option value="user">User</option>
-                                        <option value="admin">Admin</option>
-                                    </select>
-                                    <button 
-                                        type="submit" 
-                                        className="mt-2 bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
-                                        disabled={isPending}
-                                    >
-                                        {isPending ? 'Updating...' : 'Update Role'}
-                                    </button>
-                                </form>
-                            </td>
-                            <td className="py-3 px-6">
-                                <button 
-                                    onClick={() => openDeleteModal(user.id)}
-                                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                                    disabled={isPending}
-                                >
-                                    Delete
-                                </button>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+        <div className="space-y-4">
+            <div className="overflow-x-auto">
+                <table className="w-full bg-white mt-3">
+                    <UserTableHeader />
+                    <tbody>
+                        {currentUsers.map((user) => (
+                            <UserTableRow
+                                key={user.id}
+                                user={user}
+                                onUpdateRole={handleUpdateRole}
+                                onDelete={openDeleteModal}
+                                isPending={isPending}
+                            />
+                        ))}
+                    </tbody>
+                </table>
+            </div>
 
-            <DeleteConfirmationModal
+            {totalPages > 1 && (
+                <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={setCurrentPage}
+                />
+            )}
+
+            <ConfirmationModal
                 isOpen={isDeleteModalOpen}
                 onClose={closeDeleteModal}
-                onConfirm={confirmDelete}
+                onConfirm={handleDelete}
+                title="Konfirmasi Penghapusan"
+                message="Apakah Anda yakin ingin menghapus pengguna ini?"
+                confirmText="Hapus"
+                cancelText="Batal"
+                size="sm"
+                confirmButtonClassName="bg-red-500 hover:bg-red-600 text-white"
+                cancelButtonClassName="bg-gray-300 hover:bg-gray-400 text-gray-800"
             />
-        </>
+        </div>
     );
-}
+};
 
 export default UserTable;

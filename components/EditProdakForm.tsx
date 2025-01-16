@@ -1,4 +1,3 @@
-// components/EditProdakForm.tsx
 'use client';
 
 import { useState } from "react";
@@ -8,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { ImageUpload } from '@/components/ui/ImageUpload';
 import { FormLayout } from '@/components/ui/FormLayout';
 import { updateProdakAction } from "@/lib/data";
+import CategorySelect from "./ui/CategorySelect";
 
 interface ProdakInterface {
   id: string;
@@ -16,6 +16,7 @@ interface ProdakInterface {
   price: number;
   stock: number;
   image: string | null;
+  category?: { name: string; id: string } | null;
   userId: string;
   categoryId: string | null;
   createdAt: Date;
@@ -32,9 +33,21 @@ const EditProdakForm = ({ initialProduct }: EditProdakFormProps) => {
   const [error, setError] = useState<string | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(initialProduct.image);
   const [imageError, setImageError] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [priceValue, setPriceValue] = useState<string>(initialProduct.price.toLocaleString());
 
-  // Hapus state product dan useEffect karena sudah tidak diperlukan
-  // Data produk sudah tersedia dari prop initialProduct
+  const formatPrice = (value: string) => {
+    // Hapus semua karakter non-digit
+    const numbers = value.replace(/\D/g, "");
+    
+    // Format angka dengan koma
+    return numbers.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
+
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formattedValue = formatPrice(e.target.value);
+    setPriceValue(formattedValue);
+  };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -60,7 +73,9 @@ const EditProdakForm = ({ initialProduct }: EditProdakFormProps) => {
     const formData = new FormData(e.currentTarget);
 
     try {
-      const price = parseFloat(formData.get("price") as string);
+      // Hapus koma dari nilai price sebelum parsing
+      const priceStr = priceValue.replace(/,/g, "");
+      const price = parseFloat(priceStr);
       const stock = parseInt(formData.get("stock") as string);
 
       if (isNaN(price) || isNaN(stock)) {
@@ -71,6 +86,7 @@ const EditProdakForm = ({ initialProduct }: EditProdakFormProps) => {
         id: initialProduct.id,
         name: formData.get("name") as string,
         price,
+        categoryId: selectedCategory || initialProduct.categoryId,
         stock,
         description: formData.get("description") as string,
         image: imagePreview ?? undefined,
@@ -114,12 +130,11 @@ const EditProdakForm = ({ initialProduct }: EditProdakFormProps) => {
             label="Price"
             id="price"
             name="price"
-            type="number"
+            type="text" // Ubah ke type text untuk mendukung format koma
             required
-            min="0"
-            step="0.01"
             placeholder="Enter price"
-            defaultValue={initialProduct.price}
+            value={priceValue}
+            onChange={handlePriceChange}
           />
 
           <Input
@@ -138,6 +153,13 @@ const EditProdakForm = ({ initialProduct }: EditProdakFormProps) => {
             onImageChange={handleImageChange}
             onImageRemove={() => setImagePreview(null)}
             error={imageError ?? undefined}
+          />
+
+           <CategorySelect
+            value={selectedCategory ?? ""}
+            onChange={setSelectedCategory}
+            defaultValue={initialProduct.categoryId ?? ""}
+            label="Category"
           />
         </div>
 

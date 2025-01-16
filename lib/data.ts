@@ -23,14 +23,26 @@ export const GetUser = async() => {
 export const GetProdakByUser = async() => {
     const session = await auth();
     
-    if(!session || !session.user) redirect("dashboard")
+    if(!session || !session.user) redirect("/dashboard")
 
     const role = session.user.role
 
     if(role === "admin") {
         try{
             const prodaks = await prisma.prodak.findMany({
-                include: {user: {select: {name: true}}}
+                include: {
+                    user: {
+                        select: {
+                            name: true
+                        }
+                    },
+                    category: {
+                        select: {
+                            id: true,
+                            name: true
+                        }
+                    }
+                }
             });
             return prodaks
         }catch (error) {
@@ -39,8 +51,22 @@ export const GetProdakByUser = async() => {
     }else {
         try{
             const prodaks = await prisma.prodak.findMany({
-                where: {userId: session.user.id},
-                include: {user: {select: {name: true}}}
+                where: {
+                    userId: session.user.id
+                },
+                include: {
+                    user: {
+                        select: {
+                            name: true
+                        }
+                    },
+                    category: {
+                        select: {
+                            id: true,
+                            name: true
+                        }
+                    }
+                }
             });
             return prodaks
         }catch (error) {
@@ -48,8 +74,6 @@ export const GetProdakByUser = async() => {
         }
     }
 }
-// Konfigurasi Cloudinary
-
 export async function uploadImageToCloudinary(base64Image: string) {
     try {
         const base64Data = base64Image.replace(/^data:image\/\w+;base64,/, '');
@@ -72,6 +96,7 @@ export async function createProdakAction(data: {
     price: number;
     stock: number;
     description: string;
+    categoryId?: string;
     image?: string;
 }) {
     const session = await auth();
@@ -92,6 +117,7 @@ export async function createProdakAction(data: {
                 price: data.price,
                 stock: data.stock,
                 description: data.description,
+                categoryId: data.categoryId,
                 image: imageUrl,
                 userId: session.user.id ?? ''
             }
@@ -233,6 +259,7 @@ export async function updateProdakAction(data: {
     name: string;
     price: number;
     stock: number;
+    categoryId: string | null;
     description: string;
     image?: string;
 }) {
@@ -269,6 +296,7 @@ export async function updateProdakAction(data: {
                 name: data.name,
                 price: data.price,
                 stock: data.stock,
+                categoryId: data.categoryId,
                 description: data.description,
                 image: imageUrl,
             }
@@ -280,6 +308,134 @@ export async function updateProdakAction(data: {
         return { 
             success: false, 
             error: error instanceof Error ? error.message : "Failed to update product" 
+        };
+    }
+}
+
+// Get all categories
+export const GetCategories = async() => {
+    const session = await auth();
+    
+    if(!session || !session.user) redirect("dashboard")
+    
+    try {
+        const categories = await prisma.category.findMany();
+        return categories;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+// Get category by ID
+export const GetCategoryById = async(id: string) => {
+    const session = await auth();
+    
+    if(!session || !session.user) redirect("dashboard")
+    
+    try {
+        const category = await prisma.category.findUnique({
+            where: { id }
+        });
+        return category;
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
+}
+
+// Create category
+export async function createCategoryAction(data: {
+    name: string;
+    description?: string;
+}) {
+    const session = await auth();
+    
+    if (!session?.user || session.user.role !== "admin") {
+        return { success: false, error: "Unauthorized" };
+    }
+
+    try {
+        const category = await prisma.category.create({
+            data: {
+                name: data.name,
+            }
+        });
+
+        return { success: true, data: category };
+    } catch (error) {
+        console.error('Error creating category:', error);
+        return { 
+            success: false, 
+            error: error instanceof Error ? error.message : "Failed to create category" 
+        };
+    }
+}
+
+// Update category
+export async function updateCategoryAction(data: {
+    id: string;
+    name: string;
+    description?: string;
+}) {
+    const session = await auth();
+    
+    if (!session?.user || session.user.role !== "admin") {
+        return { success: false, error: "Unauthorized" };
+    }
+
+    try {
+        const existingCategory = await prisma.category.findUnique({
+            where: { id: data.id },
+        });
+
+        if (!existingCategory) {
+            return { success: false, error: "Category not found" };
+        }
+
+        const updatedCategory = await prisma.category.update({
+            where: { id: data.id },
+            data: {
+                name: data.name,
+            }
+        });
+
+        return { success: true, data: updatedCategory };
+    } catch (error) {
+        console.error('Error updating category:', error);
+        return { 
+            success: false, 
+            error: error instanceof Error ? error.message : "Failed to update category" 
+        };
+    }
+}
+
+// Delete category
+export async function deleteCategoryAction(id: string) {
+    const session = await auth();
+    
+    if (!session?.user || session.user.role !== "admin") {
+        return { success: false, error: "Unauthorized" };
+    }
+
+    try {
+        const category = await prisma.category.findUnique({
+            where: { id },
+        });
+
+        if (!category) {
+            return { success: false, error: "Category not found" };
+        }
+
+        await prisma.category.delete({
+            where: { id },
+        });
+
+        return { success: true };
+    } catch (error) {
+        console.error('Error deleting category:', error);
+        return { 
+            success: false, 
+            error: error instanceof Error ? error.message : "Failed to delete category" 
         };
     }
 }

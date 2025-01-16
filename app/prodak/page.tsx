@@ -1,5 +1,5 @@
 
-import ProdakList from "@/components/ui/ProductList";
+import ProdakList from "@/components/ProductList";
 import { IoMdAdd } from "react-icons/io";
 import { FiDownload } from "react-icons/fi";
 import Link from "next/link";
@@ -22,7 +22,10 @@ const ProdakPage = () => {
                                      rounded-lg hover:bg-blue-50 transition-colors duration-200"
                         >
                             <FiDownload className="mr-2 text-xl" />
-                            Export Data
+                            <Link href="/prodak/catagory">
+                               Add Category
+                            </Link>
+                            
                         </button>
                         
                         {/* Update button untuk membuka modal */}

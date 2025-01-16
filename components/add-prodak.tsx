@@ -1,13 +1,14 @@
-// pages/prodak/add.tsx
+// AddProdak.tsx
 "use client";
 
 import { useState } from "react";
 import { createProdakAction } from "@/lib/data";
 import { useRouter } from "next/navigation";
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { ImageUpload } from '@/components/ui/ImageUpload';
-import { FormLayout } from '@/components/ui/FormLayout';
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { ImageUpload } from "@/components/ui/ImageUpload";
+import { FormLayout } from "@/components/ui/FormLayout";
+import CategorySelect from "@/components/ui/CategorySelect";
 
 const AddProdak = () => {
   const router = useRouter();
@@ -15,6 +16,21 @@ const AddProdak = () => {
   const [error, setError] = useState<string | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageError, setImageError] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [priceValue, setPriceValue] = useState<string>("");
+
+  const formatPrice = (value: string) => {
+    // Hapus semua karakter non-digit
+    const numbers = value.replace(/\D/g, "");
+    
+    // Format angka dengan koma
+    return numbers.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
+
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formattedValue = formatPrice(e.target.value);
+    setPriceValue(formattedValue);
+  };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -40,11 +56,17 @@ const AddProdak = () => {
     const formData = new FormData(e.currentTarget);
 
     try {
-      const price = parseFloat(formData.get("price") as string);
+      // Hapus koma dari nilai price sebelum parsing
+      const priceStr = priceValue.replace(/,/g, "");
+      const price = parseFloat(priceStr);
       const stock = parseInt(formData.get("stock") as string);
 
       if (isNaN(price) || isNaN(stock)) {
         throw new Error("Invalid price or stock value");
+      }
+
+      if (!selectedCategory) {
+        throw new Error("Please select a category");
       }
 
       const productData = {
@@ -53,6 +75,7 @@ const AddProdak = () => {
         stock,
         description: formData.get("description") as string,
         image: imagePreview ?? undefined,
+        categoryId: selectedCategory,
       };
 
       const response = await createProdakAction(productData);
@@ -92,11 +115,11 @@ const AddProdak = () => {
             label="Price"
             id="price"
             name="price"
-            type="number"
+            type="text" // Ubah ke type text untuk mendukung format koma
             required
-            min="0"
-            step="0.01"
             placeholder="Enter price"
+            value={priceValue}
+            onChange={handlePriceChange}
           />
 
           <Input
@@ -114,6 +137,12 @@ const AddProdak = () => {
             onImageChange={handleImageChange}
             onImageRemove={() => setImagePreview(null)}
             error={imageError ?? undefined}
+          />
+
+          <CategorySelect
+            value={selectedCategory ?? ""}
+            onChange={setSelectedCategory}
+            label="Category"
           />
         </div>
 
