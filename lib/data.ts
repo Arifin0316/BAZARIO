@@ -456,3 +456,244 @@ export async function deleteCategoryAction(id: string) {
         };
     }
 }
+
+export async function getOrCreateCart(userId: string) {
+    let cart = await prisma.cart.findUnique({
+      where: { userId },
+      include: {
+        items: {
+          include: {
+            prodak: true
+          }
+        }
+      }
+    });
+  
+    if (!cart) {
+      cart = await prisma.cart.create({
+        data: {
+          userId,
+          items: {
+            create: []
+          }
+        },
+        include: {
+          items: {
+            include: {
+              prodak: true
+            }
+          }
+        }
+      });
+    }
+  
+    return cart;
+  }
+
+  export async function addToCart(productId: string, quantity: number = 1) {
+    try {
+      const session = await auth();
+      if (!session?.user?.id) {
+        throw new Error("Unauthorized");
+      }
+  
+      const userId = session.user.id;
+  
+      // Cek stok produk
+      const product = await prisma.prodak.findUnique({
+        where: { id: productId }
+      });
+  
+      if (!product) {
+        throw new Error("Product not found");
+      }
+  
+      if (product.stock < quantity) {
+        throw new Error("Not enough stock available");
+      }
+  
+      // Dapatkan atau buat cart
+      const cart = await getOrCreateCart(userId);
+  
+      // Cek apakah produk sudah ada di cart
+      const existingItem = await prisma.cartItem.findFirst({
+        where: {
+          cartId: cart.id,
+          prodakId: productId
+        }
+      });
+  
+      if (existingItem) {
+        // Update quantity jika item sudah ada
+        const updatedItem = await prisma.cartItem.update({
+          where: { id: existingItem.id },
+          data: {
+            quantity: existingItem.quantity + quantity
+          },
+          include: {
+            prodak: true
+          }
+        });
+  
+        return {
+          success: true,
+          message: "Cart updated successfully",
+          data: updatedItem
+        };
+      } else {
+        // Buat item baru jika belum ada
+        const newItem = await prisma.cartItem.create({
+          data: {
+            cartId: cart.id,
+            prodakId: productId,
+            quantity
+          },
+          include: {
+            prodak: true
+          }
+        });
+  
+        return {
+          success: true,
+          message: "Item added to cart",
+          data: newItem
+        };
+      }
+    } catch (error) {
+      console.error("Add to cart error:", error);
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : "Failed to add item to cart",
+        error
+      };
+    }
+  }
+
+  export async function getUserCart() {
+    try {
+      const session = await auth();
+      if (!session?.user?.id) {
+        throw new Error("Unauthorized");
+      }
+  
+      const cart = await prisma.cart.findUnique({
+        where: { userId: session.user.id },
+        include: {
+          items: {
+            include: {
+              prodak: true
+            }
+          }
+        }
+      });
+  
+      return {
+        success: true,
+        data: cart
+      };
+    } catch (error) {
+      console.error("Get cart error:", error);
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : "Failed to get cart",
+        error
+      };
+    }
+  }
+
+  export async function updateCartItemQuantity(itemId: string, quantity: number) {
+    try {
+      const session = await auth();
+      if (!session?.user?.id) {
+        throw new Error("Unauthorized");
+      }
+  
+      if (quantity < 1) {
+        throw new Error("Quantity must be at least 1");
+      }
+  
+      const cartItem = await prisma.cartItem.findUnique({
+        where: { id: itemId },
+        include: {
+          cart: true,
+          prodak: true
+        }
+      });
+  
+      if (!cartItem) {
+        throw new Error("Cart item not found");
+      }
+  
+      if (cartItem.cart.userId !== session.user.id) {
+        throw new Error("Unauthorized");
+      }
+  
+      if (cartItem.prodak.stock < quantity) {
+        throw new Error("Not enough stock available");
+      }
+  
+      const updatedItem = await prisma.cartItem.update({
+        where: { id: itemId },
+        data: { quantity },
+        include: {
+          prodak: true
+        }
+      });
+  
+      return {
+        success: true,
+        message: "Quantity updated successfully",
+        data: updatedItem
+      };
+    } catch (error) {
+      console.error("Update quantity error:", error);
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : "Failed to update quantity",
+        error
+      };
+    }
+  }
+
+  export async function removeFromCart(itemId: string) {
+    try {
+      const session = await auth();
+      if (!session?.user?.id) {
+        throw new Error("Unauthorized");
+      }
+  
+      const cartItem = await prisma.cartItem.findUnique({
+        where: { id: itemId },
+        include: {
+          cart: true
+        }
+      });
+  
+      if (!cartItem) {
+        throw new Error("Cart item not found");
+      }
+  
+      if (cartItem.cart.userId !== session.user.id) {
+        throw new Error("Unauthorized");
+      }
+  
+      await prisma.cartItem.delete({
+        where: { id: itemId }
+      });
+  
+      return {
+        success: true,
+        message: "Item removed from cart"
+      };
+    } catch (error) {
+      console.error("Remove from cart error:", error);
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : "Failed to remove item from cart",
+        error
+      };
+    }
+  }
+
+  
+

@@ -31,6 +31,14 @@ export interface ProdakInterface1 {
   };
 }
 
+export interface CreateOrderInput {
+  shippingAddress: string;
+  phoneNumber: string;
+  notes?: string;
+  shippingMethod?: string;
+  shippingCost?: number;
+}
+
 // export interface ProdakInterface {
 //   id: string;
 //   name: string;

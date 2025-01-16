@@ -1,16 +1,18 @@
-'use client'; // Menandai sebagai client component
+'use client';
 
 import Image from 'next/image';
 import Link from 'next/link';
 import { FiShoppingCart } from "react-icons/fi";
 import type { ProdakInterface1 } from '@/types';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface ProductCardProps {
   product: ProdakInterface1;
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
+  const router = useRouter();
   const [isClient, setIsClient] = useState(false)
  
   useEffect(() => {
@@ -18,14 +20,14 @@ export default function ProductCard({ product }: ProductCardProps) {
   }, [])
 
   if (!isClient) return null
-  const handleAddToCart = async () => {
-    // Implementasi add to cart
-    console.log('Adding to cart:', product.id);
+
+  const handleAddToCart = () => {
+    router.push(`/prodak/${product.id}`);
   };
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
-      <Link href={`/products/${product.id}`} className="block">
+      <Link href={`/prodak/${product.id}`} className="block">
         <div className="relative w-full h-48">
           {product.image ? (
             <Image
@@ -82,7 +84,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             }`}
         >
           <FiShoppingCart className="w-4 h-4" />
-          {product.stock > 0 ? 'Add to Cart' : 'Out of Stock'}
+          {product.stock > 0 ? 'View Details' : 'Out of Stock'}
         </button>
       </div>
     </div>
