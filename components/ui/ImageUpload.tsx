@@ -21,7 +21,7 @@ export const ImageUpload = ({ imagePreview, onImageChange, onImageRemove, error 
               src={imagePreview}
               alt="Preview"
               fill
-              className="object-cover rounded-lg"
+              className="object-cover rounded-lg "
             />
             <button
               type="button"

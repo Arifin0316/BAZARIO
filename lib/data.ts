@@ -20,6 +20,23 @@ export const GetUser = async() => {
     }
 }
 
+export const allProdak = async() => {
+    try{
+        const prodaks = await prisma.prodak.findMany({
+            include: {
+                user: {
+                    select: {
+                        name: true
+                    }
+                }
+            }
+        });
+        return prodaks
+    }catch (error) {
+        console.log(error)
+    }
+}
+
 export const GetProdakByUser = async() => {
     const session = await auth();
     

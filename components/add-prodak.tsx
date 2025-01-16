@@ -100,77 +100,116 @@ const AddProdak = () => {
       subtitle="Fill in the details below to add a new product."
       error={error}
     >
-      <form onSubmit={handleSubmit} className="p-6 space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Input
-            label="Product Name"
-            id="name"
-            name="name"
-            type="text"
-            required
-            placeholder="Enter product name"
-          />
+      <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-sm">
+        <form onSubmit={handleSubmit} className="p-8">
+          {/* Main Form Content */}
+          <div className="space-y-8">
+            {/* Product Details Section */}
+            <div className="bg-gray-50 p-6 rounded-lg border border-gray-100">
+              <h3 className="text-lg font-medium text-gray-900 mb-6">
+                Product Details
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                <Input
+                  label="Product Name"
+                  id="name"
+                  name="name"
+                  type="text"
+                  required
+                  placeholder="Enter product name"
+                  className="bg-white focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+                />
 
-          <Input
-            label="Price"
-            id="price"
-            name="price"
-            type="text" // Ubah ke type text untuk mendukung format koma
-            required
-            placeholder="Enter price"
-            value={priceValue}
-            onChange={handlePriceChange}
-          />
+                <Input
+                  label="Price"
+                  id="price"
+                  name="price"
+                  type="text"
+                  required
+                  placeholder="Enter price"
+                  value={priceValue}
+                  onChange={handlePriceChange}
+                  className="bg-white focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+                />
 
-          <Input
-            label="Stock"
-            id="stock"
-            name="stock"
-            type="number"
-            required
-            min="0"
-            placeholder="Enter stock quantity"
-          />
+                <Input
+                  label="Stock"
+                  id="stock"
+                  name="stock"
+                  type="number"
+                  required
+                  min="0"
+                  placeholder="Enter stock quantity"
+                  className="bg-white focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+                />
 
-          <ImageUpload
-            imagePreview={imagePreview}
-            onImageChange={handleImageChange}
-            onImageRemove={() => setImagePreview(null)}
-            error={imageError ?? undefined}
-          />
+                <CategorySelect
+                  value={selectedCategory ?? ""}
+                  onChange={setSelectedCategory}
+                  label="Category"
+                />
+              </div>
+            </div>
 
-          <CategorySelect
-            value={selectedCategory ?? ""}
-            onChange={setSelectedCategory}
-            label="Category"
-          />
-        </div>
+            {/* Image Upload Section */}
+            <div className="bg-gray-50 p-6 rounded-lg border border-gray-100">
+              <h3 className="text-lg font-medium text-gray-900 mb-6">
+                Product Image
+              </h3>
+              <ImageUpload
+                imagePreview={imagePreview}
+                onImageChange={handleImageChange}
+                onImageRemove={() => setImagePreview(null)}
+                error={imageError ?? undefined}
+              />
+            </div>
 
-        <Input
-          label="Description"
-          id="description"
-          name="description"
-          type="textarea"
-          required
-          placeholder="Enter product description"
-        />
+            {/* Description Section */}
+            <div className="bg-gray-50 p-6 rounded-lg border border-gray-100">
+              <h3 className="text-lg font-medium text-gray-900 mb-6">
+                Product Description
+              </h3>
+              <Input
+                label="Description"
+                id="description"
+                name="description"
+                type="textarea"
+                required
+                placeholder="Enter product description"
+                className="bg-white min-h-[120px] focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+              />
+            </div>
+          </div>
 
-        <div className="flex justify-end space-x-3 pt-6">
-          <Button
-            variant="secondary"
-            onClick={() => router.back()}
-          >
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            loading={loading}
-            loadingText="Creating..."
-          >
-            Create Product
-          </Button>
-        </div>
-      </form>
+          {/* Error Message */}
+          {error && (
+            <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-600 text-sm">{error}</p>
+            </div>
+          )}
+
+          {/* Form Actions */}
+          <div className="mt-8 pt-6 border-t border-gray-200 flex justify-end space-x-4">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => router.back()}
+              className="px-6 py-2 hover:bg-gray-100 transition-colors duration-200"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              loading={loading}
+              loadingText="Creating..."
+              className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white transition-colors duration-200"
+              disabled={loading}
+            >
+              Create Product
+            </Button>
+          </div>
+        </form>
+      </div>
     </FormLayout>
   );
 };
