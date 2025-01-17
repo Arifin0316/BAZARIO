@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import cloudinary from "@/lib/cloudinary";
 import {CreateOrderInput} from '@/types/index';
 import { z } from 'zod';
+import { OrderStatus } from "@prisma/client";
 
 
 export const GetUser = async() => {
@@ -767,7 +768,7 @@ export async function createOrders(input: CreateOrderInput) {
           shippingMethod: input.shippingMethod,
           shippingCost: input.shippingCost,
           status: 'PENDING',
-          paymentStatus: 'UNPAID',
+          paymentStatus: 'PAID',
           orderItems: {
             create: cart.items.map(item => ({
               prodakId: item.prodak.id,
@@ -906,6 +907,119 @@ export async function cancelOrder(orderId: string) {
     return {
       success: false,
       message: "Failed to cancel order"
+    };
+  }
+}
+
+export async function getSellerOrders(userId: string) {
+  try {
+    const orders = await prisma.order.findMany({
+      where: {
+        orderItems: {
+          some: {
+            prodak: {
+              userId: userId
+            }
+          }
+        }
+      },
+      include: {
+        orderItems: {
+          include: {
+            prodak: {
+              select: {
+                name: true,
+                image: true,
+                price: true
+              }
+            }
+          }
+        },
+        user: {
+          select: {
+            name: true,
+            email: true
+          }
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+
+    return {
+      success: true,
+      data: orders
+    };
+  } catch (error) {
+    console.error("Get seller orders error:", error);
+    return {
+      success: false,
+      message: "Failed to get orders"
+    };
+  }
+}
+
+
+interface UpdateOrderStatusInput {
+  orderId: string;
+  status: OrderStatus;
+  trackingNumber?: string;
+}
+
+export async function updateOrderStatus(input: UpdateOrderStatusInput) {
+  const session = await auth();
+  if (!session?.user) {
+    return { success: false, error: "Unauthorized" };
+}
+  try {
+    // Verify seller owns the products in the order
+    const order = await prisma.order.findFirst({
+      where: {
+        id: input.orderId,
+        orderItems: {
+          some: {
+            prodak: {
+              userId: session.user.id
+            }
+          }
+        }
+      }
+    });
+
+    if (!order) {
+      return {
+        success: false,
+        message: "Order not found or unauthorized"
+      };
+    }
+
+    const updatedOrder = await prisma.order.update({
+      where: { id: input.orderId },
+      data: {
+        status: input.status,
+        trackingNumber: input.trackingNumber,
+        updatedAt: new Date()
+      },
+      include: {
+        orderItems: {
+          include: {
+            prodak: true
+          }
+        }
+      }
+    });
+
+    return {
+      success: true,
+      data: updatedOrder
+    };
+
+  } catch (error) {
+    console.error("Update order status error:", error);
+    return {
+      success: false,
+      message: "Failed to update order status"
     };
   }
 }
