@@ -18,6 +18,9 @@ const Navbar = async () => {
             <li>
               <Link href="/cart">cart</Link>
             </li>
+            <li>
+              <Link href="/orders">order</Link>
+            </li>
             {sessent && (
               <>
                 <li>
