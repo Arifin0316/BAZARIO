@@ -5,6 +5,7 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import cloudinary from "@/lib/cloudinary";
 import {CreateOrderInput} from '@/types/index';
+import { hash, compare } from "bcrypt-ts";
 import { z } from 'zod';
 import { OrderStatus } from "@prisma/client";
 
@@ -698,23 +699,28 @@ export async function getOrCreateCart(userId: string) {
   }
 
   export async function GetAllProdakById(id: string) {
-
     try {
-        const prodak = await prisma.prodak.findUnique({
-            where: { id },
-            include: { user: { select: { name: true } } }
-        });
-
-        if (!prodak) {
-            return null;
+      const product = await prisma.prodak.findUnique({
+        where: { id },
+        include: {
+          reviews: {
+            include: {
+              user: {
+                select: {
+                  name: true,
+                  image: true
+                }
+              }
+            }
+          }
         }
-
-        return prodak;
+      });
+      return product;
     } catch (error) {
-        console.error('Error fetching product:', error);
-        return null;
+      console.error('Get product error:', error);
+      return null;
     }
-}
+  }
 
 export async function createOrders(input: CreateOrderInput) {
   const session = await auth();
@@ -1020,6 +1026,292 @@ export async function updateOrderStatus(input: UpdateOrderStatusInput) {
     return {
       success: false,
       message: "Failed to update order status"
+    };
+  }
+}
+
+export async function uploadImageProfileToCloudinary(base64Image: string) {
+  try {
+    const base64Data = base64Image.replace(/^data:image\/\w+;base64,/, '');
+    const result = await cloudinary.uploader.upload(`data:image/png;base64,${base64Data}`, {
+      folder: 'profile',
+    });
+    return result.secure_url;
+  } catch (error) {
+    console.error('Upload error:', error);
+    if (error instanceof Error) {
+      throw new Error(`Failed to upload image: ${error.message}`);
+    } else {
+      throw new Error('Failed to upload image: Unknown error');
+    }
+  }
+}
+
+// Update profile function
+export async function updateProfile(formData: FormData) {
+  const session = await auth();
+      if (!session?.user?.id) {
+        throw new Error("Unauthorized");
+      }
+  try {
+    // Get form data
+    const name = formData.get('name') as string;
+    const phoneNumber = formData.get('phoneNumber') as string;
+    const address = formData.get('address') as string;
+    const imageBase64 = formData.get('imageBase64') as string;
+
+    // Prepare update data
+    const updateData: { name?: string; phoneNumber?: string; address?: string; image?: string } = {
+      name: name || undefined,
+      phoneNumber: phoneNumber || undefined,
+      address: address || undefined,
+    };
+
+    // Handle image upload if provided
+    if (imageBase64) {
+      try {
+        const imageUrl = await uploadImageProfileToCloudinary(imageBase64);
+        updateData.image = imageUrl;
+      } catch (error) {
+        console.error('Image upload error:', error);
+        return { success: false, message: "Failed to upload image" };
+      }
+    }
+
+    // Update user profile
+    const updatedUser = await prisma.user.update({
+      where: { id: session.user.id },
+      data: updateData,
+    });
+
+ 
+    return { success: true, data: updatedUser };
+
+  } catch (error) {
+    console.error('Update profile error:', error);
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : "Failed to update profile"
+    };
+  }
+}
+// Update password function
+export async function updatePassword(formData: FormData) {
+  const session = await auth();
+  if (!session) {
+    return { success: false, error: "Unauthorized" };
+}
+
+  try {
+    const currentPassword = formData.get('currentPassword') as string;
+    const newPassword = formData.get('newPassword') as string;
+    const confirmPassword = formData.get('confirmPassword') as string;
+
+    // Validate inputs
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      return { success: false, message: "All password fields are required" };
+    }
+
+    if (newPassword !== confirmPassword) {
+      return { success: false, message: "New passwords don't match" };
+    }
+
+    if (newPassword.length < 6) {
+      return { success: false, message: "Password must be at least 6 characters" };
+    }
+
+    // Get current user with password
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id }
+    });
+
+    if (!user?.password) {
+      return { success: false, message: "No password set for this account" };
+    }
+
+    // Verify current password
+    const isPasswordValid = await compare(currentPassword, user.password);
+    if (!isPasswordValid) {
+      return { success: false, message: "Current password is incorrect" };
+    }
+
+    // Hash and update new password
+    const hashedPassword = await hash(newPassword, 12);
+    await prisma.user.update({
+      where: { id: session.user.id },
+      data: { password: hashedPassword }
+    });
+
+    return { success: true, message: "Password updated successfully" };
+
+  } catch (error) {
+    console.error('Update password error:', error);
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : "Failed to update password"
+    };
+  }
+}
+
+// lib/data.ts
+
+export async function getUserProfile(userId: string) {
+  try {
+    // Cek jika userId ada
+    if (!userId) {
+      return {
+        success: false,
+        message: "User ID is required"
+      };
+    }
+
+    // Ambil data user dengan relasi yang diperlukan
+    const user = await prisma.user.findUnique({
+      where: { 
+        id: userId 
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        image: true,
+        role: true,
+        phoneNumber: true,
+        address: true,
+        orders: {
+          select: {
+            id: true,
+            status: true,
+            createdAt: true,
+          },
+          orderBy: {
+            createdAt: 'desc'
+          },
+          take: 5 // Ambil 5 order terakhir
+        },
+        reviews: {
+          select: {
+            id: true,
+            rating: true,
+            comment: true,
+            createdAt: true,
+            prodak: {
+              select: {
+                id: true,
+                name: true,
+                image: true
+              }
+            }
+          },
+          orderBy: {
+            createdAt: 'desc'
+          },
+          take: 5 // Ambil 5 review terakhir
+        },
+        cart: {
+          include: {
+            items: {
+              include: {
+                prodak: true
+              }
+            }
+          }
+        }
+      }
+    });
+
+    if (!user) {
+      return {
+        success: false,
+        message: "User not found"
+      };
+    }
+
+    return {
+      success: true,
+      data: user
+    };
+
+  } catch (error) {
+    console.error("Get user profile error:", error);
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : "Failed to get user profile"
+    };
+  }
+}
+
+interface CreateReviewInput {
+  productId: string;
+  rating: number;
+  comment?: string;
+}
+
+export async function createReview(input: CreateReviewInput) {
+  const session = await auth();
+  if (!session) {
+    return { success: false, error: "Unauthorized" };
+}
+
+  try {
+    // Check if user already reviewed this product
+    const existingReview = await prisma.review.findFirst({
+      where: {
+        userId: session.user.id,
+        prodakId: input.productId
+      }
+    });
+
+    if (existingReview) {
+      return { success: false, message: "You have already reviewed this product" };
+    }
+
+    // Ensure userId is defined
+    if (!session.user.id) {
+      return { success: false, message: "User ID is undefined" };
+    }
+
+    // Create review
+    const review = await prisma.review.create({
+      data: {
+        userId: session.user.id,
+        prodakId: input.productId,
+        rating: input.rating,
+        comment: input.comment
+      }
+    });
+
+    return { success: true, data: review };
+
+  } catch (error) {
+    console.error('Create review error:', error);
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : "Failed to create review"
+    };
+  }
+}
+
+export async function getReview({ id }: { id: string }) {
+  const session = await auth();
+  if (!session) {
+    return { success: false, error: "Unauthorized" }
+}
+
+  try {
+    // Check if user already reviewed this product
+    const userRiview = await prisma.review.findFirst({
+      where: {
+        userId: session.user.id,
+        prodakId: id
+      }
+    })
+    return { success: true, data: userRiview };
+  } catch (error) {
+    console.error('Create review error:', error);
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : "Failed to create review"
     };
   }
 }

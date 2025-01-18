@@ -60,6 +60,16 @@ const NavbarMenu = ({ session }: NavbarClientProps) => {
                 Home
               </Link>
               <Link 
+                href="/profile" 
+                className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition relative
+                  ${isActivePath('/profile') 
+                    ? 'text-red-600 after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-red-600' 
+                    : 'text-gray-600 hover:text-gray-900'}`}
+              >
+                <Home className="w-4 h-4 mr-2" />
+                profile
+              </Link>
+              <Link 
                 href="/cart" 
                 className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition relative
                   ${isActivePath('/cart') 

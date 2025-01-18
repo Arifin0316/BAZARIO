@@ -3,14 +3,38 @@ import Image from 'next/image';
 import { GetAllProdakById } from '@/lib/data';
 import AddToCartButton from '../../../components/product/AddToCartButton';
 import { notFound } from 'next/navigation';
+import ReviewList from '@/components/reviews/ReviewList';
+import { auth } from '@/auth';
+import { prisma } from '@/lib/prisma';
+import { ProdakInterface1 } from '@/types';
+
+
 
 export default async function ProductDetail({ params }: {params: Promise<{ id: string }>}) {
   const id = (await params).id
-  const product = await GetAllProdakById(id);
-
+  const session = await auth();
+  const product = await GetAllProdakById(id) as unknown as ProdakInterface1;
+ 
   if (!product) {
     notFound();
   }
+  const userReview = session?.user?.id 
+  ? await prisma.review.findFirst({
+      where: {
+        userId: session.user.id,
+        prodakId: id
+      },
+      include: {
+        user: {
+          select: {
+            name: true,
+            image: true
+          }
+        }
+      }
+    })
+  : null;
+
 
   return (
     <div className="container mx-auto px-4 md:px-20 py-8">
@@ -67,6 +91,12 @@ export default async function ProductDetail({ params }: {params: Promise<{ id: s
               <AddToCartButton product={product} />
             </div>
           </div>
+        <ReviewList 
+            productId={id}
+            reviews={product.reviews}
+            userReview={userReview}
+            userId={session?.user?.id || null}
+        />
         </div>
       </div>
     </div>

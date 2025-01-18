@@ -1,3 +1,4 @@
+
 export interface ProdakInterface {
   id: string;
   name: string;
@@ -15,7 +16,20 @@ export interface ProdakInterface {
   image?: string;
 }
 
+export interface Review {
+  id: string;
+  rating: number;
+  comment: string | null;
+  createdAt: Date;
+  user: {
+    name: string | null;
+    image: string | null;
+  };
+}
+
+
 export interface ProdakInterface1 {
+  reviews: Review[];
   id: string;
   name: string;
   price: number;
