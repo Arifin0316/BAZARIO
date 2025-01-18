@@ -93,7 +93,7 @@ export default async function ProductDetail({ params }: {params: Promise<{ id: s
           </div>
         <ReviewList 
             productId={id}
-            reviews={product.reviews}
+            reviews={product.reviews || []}
             userReview={userReview}
             userId={session?.user?.id || null}
         />

@@ -1,8 +1,9 @@
 import ProductCard from '@/components/product/ProductCard';
 import { allProdak } from '@/lib/data';
+import { ProdakInterface1 } from '@/types';
 
 export default async function ProductsPage() {
-  const products = await allProdak();
+  const products = await allProdak() as unknown as ProdakInterface1[];
 
   if (!products) {
     return (

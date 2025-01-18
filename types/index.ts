@@ -29,20 +29,29 @@ export interface Review {
 
 
 export interface ProdakInterface1 {
-  reviews: Review[];
   id: string;
   name: string;
   price: number;
+  description: string | null;
+  image: string | null;
+  stock: number;
+  categoryId: string | null;
+  userId: string;
   createdAt: Date;
   updatedAt: Date;
-  userId: string;
-  categoryId: string | null;
-  description: string | null | undefined; // Allow null or undefined
-  image: string | null | undefined; // Allow null or undefined
-  stock: number;
   user: {
     name: string | null;
   };
+  reviews?: {
+    id: string;
+    rating: number;
+    comment: string | null;
+    createdAt: Date;
+    user: {
+      name: string | null;
+      image: string | null;
+    };
+  }[];
 }
 
 export interface CreateOrderInput {
