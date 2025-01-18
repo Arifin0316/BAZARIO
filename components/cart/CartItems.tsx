@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import { updateCartItemQuantity, removeFromCart } from '@/lib/data';
 import { FiTrash } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
+import { formatPrice } from '@/lib/utils';
 
 interface CartItem {
   id: string;
@@ -21,14 +22,8 @@ interface CartItem {
 
 export default function CartItems({ items }: { items: CartItem[] }) {
   const [loading, setLoading] = useState<string | null>(null);
-  const [isClient, setIsClient] = useState(false)
+
  
-  useEffect(() => {
-    setIsClient(true)
-  }, [])
-
-  if (!isClient) return null
-
   const handleQuantityChange = async (itemId: string, newQuantity: number) => {
     try {
       setLoading(itemId);
@@ -78,7 +73,8 @@ export default function CartItems({ items }: { items: CartItem[] }) {
                   <Image
                     src={item.prodak.image}
                     alt={item.prodak.name}
-                    fill
+                    width={500}
+                    height={500}
                     className="object-cover rounded-md"
                   />
                 ) : (
@@ -96,7 +92,7 @@ export default function CartItems({ items }: { items: CartItem[] }) {
                   {item.prodak.name}
                 </Link>
                 <p className="mt-1 text-gray-500">
-                  Rp {item.prodak.price.toLocaleString()}
+                  Rp {formatPrice(item.prodak.price)}
                 </p>
               </div>
 

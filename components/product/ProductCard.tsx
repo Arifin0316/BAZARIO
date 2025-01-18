@@ -2,17 +2,16 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { FiShoppingCart } from "react-icons/fi";
 import type { ProdakInterface1 } from '@/types';
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import CartButton from '@/components/product/addCart';
 
 interface ProductCardProps {
   product: ProdakInterface1;
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const router = useRouter();
+
   const [isClient, setIsClient] = useState(false)
  
   useEffect(() => {
@@ -21,9 +20,6 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   if (!isClient) return null
 
-  const handleAddToCart = () => {
-    router.push(`/prodak/${product.id}`);
-  };
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
@@ -34,7 +30,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               src={product.image}
               alt={product.name}
               fill
-              className="object-cover"
+              className="object-cover "
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
           ) : (
@@ -73,19 +69,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           </div>
         </div>
 
-        <button
-          onClick={handleAddToCart}
-          disabled={product.stock <= 0}
-          className={`mt-4 w-full flex items-center justify-center gap-2 py-2 px-4 rounded-md transition-colors
-            ${
-              product.stock > 0
-                ? 'bg-black text-white hover:bg-gray-800'
-                : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-            }`}
-        >
-          <FiShoppingCart className="w-4 h-4" />
-          {product.stock > 0 ? 'View Details' : 'Out of Stock'}
-        </button>
+        <CartButton product={product} />
       </div>
     </div>
   );

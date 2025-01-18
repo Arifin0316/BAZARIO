@@ -1,7 +1,7 @@
 // app/prodak/[id]/page.tsx
 import Image from 'next/image';
 import { GetAllProdakById } from '@/lib/data';
-import AddToCartButton from './AddToCartButton';
+import AddToCartButton from '../../../components/product/AddToCartButton';
 import { notFound } from 'next/navigation';
 
 export default async function ProductDetail({ params }: {params: Promise<{ id: string }>}) {

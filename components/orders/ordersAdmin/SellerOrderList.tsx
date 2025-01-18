@@ -135,7 +135,7 @@ export default function SellerOrderList({ orders }: { orders: Order[] }) {
               </div>
 
               {/* Status Update Controls */}
-              {order.paymentStatus === 'UNPAID' && (
+              {order.paymentStatus === 'PAID' && (
                 <div className="mt-4 lg:mt-0 flex items-center gap-4">
                   {order.status === 'PENDING' && (
                     <button
