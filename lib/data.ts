@@ -23,21 +23,32 @@ export const GetUser = async() => {
     }
 }
 
-export const allProdak = async() => {
-    try{
-        const prodaks = await prisma.prodak.findMany({
-            include: {
-                user: {
-                    select: {
-                        name: true
-                    }
-                }
-            }
-        });
-        return prodaks
-    }catch (error) {
-        console.log(error)
-    }
+export async function allProdak(search?: string) {
+  try {
+    const prodaks = await prisma.prodak.findMany({
+      where: search ? {
+        OR: [
+          { name: { contains: search, mode: 'insensitive' } },
+          { description: { contains: search, mode: 'insensitive' } }
+        ]
+      } : undefined,
+      include: {
+        user: {
+          select: {
+            name: true
+          }
+        },
+        reviews: true
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+    return prodaks;
+  } catch (error) {
+    console.error('Error getting products:', error);
+    return [];
+  }
 }
 
 export const GetProdakByUser = async() => {
@@ -274,6 +285,26 @@ export async function GetProdakById(id: string) {
     }
 }
 
+export async function GetProdakByCatagoriId(id: string) {
+  try {
+    const category = await prisma.category.findUnique({
+      where: { id },
+      include: {
+        prodaks: true, // Ambil semua produk terkait kategori ini
+      },
+    });
+
+    // Periksa apakah kategori ditemukan
+    if (!category) {
+      return null;
+    }
+
+    return category;
+  } catch (error) {
+    console.error('Error fetching category by ID:', error);
+    return null;
+  }
+}
 export async function updateProdakAction(data: {
     id: string;
     name: string;
@@ -334,10 +365,6 @@ export async function updateProdakAction(data: {
 
 // Get all categories
 export const GetCategories = async() => {
-    const session = await auth();
-    
-    if(!session || !session.user) redirect("dashboard")
-    
     try {
         const categories = await prisma.category.findMany();
         return categories;

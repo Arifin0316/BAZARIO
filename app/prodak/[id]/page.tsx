@@ -38,7 +38,7 @@ export default async function ProductDetail({ params }: {params: Promise<{ id: s
 
   return (
     <div className="container mx-auto px-4 md:px-20 py-8">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto space-y-8">
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Image Section */}
@@ -91,6 +91,8 @@ export default async function ProductDetail({ params }: {params: Promise<{ id: s
               <AddToCartButton product={product} />
             </div>
           </div>
+        </div>
+        <div className='bg-white rounded-lg shadow-lg overflow-hidden'>
         <ReviewList 
             productId={id}
             reviews={product.reviews || []}

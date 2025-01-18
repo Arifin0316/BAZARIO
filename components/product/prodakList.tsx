@@ -1,8 +1,9 @@
 import ProductCard from '@/components/product/ProductCard';
 import { allProdak } from '@/lib/data';
+import { ProdakInterface1 } from '@/types';
 
-export default async function ProductsPage() {
-  const products = await allProdak();
+export default async function ProductsList() {
+  const products = await allProdak() as unknown as ProdakInterface1[];
 
   if (!products) {
     return (
@@ -22,10 +23,10 @@ export default async function ProductsPage() {
   }
 
   return (
-    <div className="container mx-auto px-20 py-8">
-      <h1 className="text-2xl font-bold mb-6">Our Products</h1>
-      
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    <div className="container mx-auto px-6 py-8">
+      <div className="mb-6">
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {products.map((product) => (
           <ProductCard
             key={product.id}

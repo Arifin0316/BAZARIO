@@ -30,6 +30,7 @@ export default function ReviewList({ productId, reviews, userReview, userId }: R
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showAllReviews, setShowAllReviews] = useState(false);
 
   const handleSubmitReview = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -68,7 +69,8 @@ export default function ReviewList({ productId, reviews, userReview, userId }: R
   const averageRating = reviews.length > 0
     ? (reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length).toFixed(1)
     : '0.0';
-
+  
+    const displayedReviews = showAllReviews ? reviews : reviews.slice(0, 1);
   return (
     <div className="mt-8">
       <h2 className="text-2xl font-bold mb-6">Customer Reviews</h2>
@@ -148,7 +150,7 @@ export default function ReviewList({ productId, reviews, userReview, userId }: R
 
       {/* Reviews List */}
       <div className="space-y-6">
-        {reviews.map((review) => (
+        {displayedReviews.map((review) => (
           <div key={review.id} className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center gap-4 mb-4">
               <Image
@@ -185,10 +187,22 @@ export default function ReviewList({ productId, reviews, userReview, userId }: R
           </div>
         ))}
 
-        {reviews.length === 0 && (
+        {reviews.length === 0 ? (
           <p className="text-center text-gray-500 py-6">
             No reviews yet. Be the first to review this product!
           </p>
+        ) : reviews.length > 1 && (
+          <div className="text-center">
+            <button
+              onClick={() => setShowAllReviews(!showAllReviews)}
+              className="inline-flex items-center justify-center px-6 py-2 border border-gray-300 
+                         rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white 
+                         hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 
+                         focus:ring-blue-500 transition-colors duration-200"
+            >
+              {showAllReviews ? 'Show Less' : `View All Reviews (${reviews.length})`}
+            </button>
+          </div>
         )}
       </div>
     </div>
