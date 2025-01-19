@@ -1,4 +1,3 @@
-// AddProdak.tsx
 "use client";
 
 import { useState } from "react";
@@ -7,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ImageUpload } from "@/components/ui/ImageUpload";
-import { FormLayout } from "@/components/ui/FormLayout";
+
 import CategorySelect from "@/components/ui/CategorySelect";
 
 const AddProdak = () => {
@@ -20,10 +19,7 @@ const AddProdak = () => {
   const [priceValue, setPriceValue] = useState<string>("");
 
   const formatPrice = (value: string) => {
-    // Hapus semua karakter non-digit
     const numbers = value.replace(/\D/g, "");
-    
-    // Format angka dengan koma
     return numbers.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   };
 
@@ -56,7 +52,6 @@ const AddProdak = () => {
     const formData = new FormData(e.currentTarget);
 
     try {
-      // Hapus koma dari nilai price sebelum parsing
       const priceStr = priceValue.replace(/,/g, "");
       const price = parseFloat(priceStr);
       const stock = parseInt(formData.get("stock") as string);
@@ -81,7 +76,7 @@ const AddProdak = () => {
       const response = await createProdakAction(productData);
 
       if (response.success) {
-        router.push("/prodak");
+        router.push("/dashboard");
         router.refresh();
       } else {
         setError(response.error ?? "An unknown error occurred");
@@ -95,122 +90,119 @@ const AddProdak = () => {
   };
 
   return (
-    <FormLayout
-      title="Add New Product"
-      subtitle="Fill in the details below to add a new product."
-      error={error}
-    >
-      <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-sm">
-        <form onSubmit={handleSubmit} className="p-8">
-          {/* Main Form Content */}
-          <div className="space-y-8">
-            {/* Product Details Section */}
-            <div className="bg-gray-50 p-6 rounded-lg border border-gray-100">
-              <h3 className="text-lg font-medium text-gray-900 mb-6">
-                Product Details
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                <Input
-                  label="Product Name"
-                  id="name"
-                  name="name"
-                  type="text"
-                  required
-                  placeholder="Enter product name"
-                  className="bg-white focus:ring-2 focus:ring-blue-500 transition-all duration-200"
-                />
+    <div className="w-full max-w-4xl mx-auto">
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Product Details */}
+      <div className="bg-white p-6 rounded-lg shadow-sm">
+        <h3 className="text-lg font-semibold text-gray-800 mb-4">
+          Product Details
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Input
+            label="Product Name"
+            id="name"
+            name="name"
+            type="text"
+            required
+            placeholder="Enter product name"
+            className="w-full"
+          />
 
-                <Input
-                  label="Price"
-                  id="price"
-                  name="price"
-                  type="text"
-                  required
-                  placeholder="Enter price"
-                  value={priceValue}
-                  onChange={handlePriceChange}
-                  className="bg-white focus:ring-2 focus:ring-blue-500 transition-all duration-200"
-                />
+          <Input
+            label="Price"
+            id="price"
+            name="price"
+            type="text"
+            required
+            placeholder="Enter price"
+            value={priceValue}
+            onChange={handlePriceChange}
+            className="w-full"
+          />
 
-                <Input
-                  label="Stock"
-                  id="stock"
-                  name="stock"
-                  type="number"
-                  required
-                  min="0"
-                  placeholder="Enter stock quantity"
-                  className="bg-white focus:ring-2 focus:ring-blue-500 transition-all duration-200"
-                />
+          <Input
+            label="Stock"
+            id="stock"
+            name="stock"
+            type="number"
+            required
+            min="0"
+            placeholder="Enter stock quantity"
+            className="w-full"
+          />
 
-                <CategorySelect
-                  value={selectedCategory ?? ""}
-                  onChange={setSelectedCategory}
-                  label="Category"
-                />
-              </div>
-            </div>
-
-            {/* Image Upload Section */}
-            <div className="bg-gray-50 p-6 rounded-lg border border-gray-100">
-              <h3 className="text-lg font-medium text-gray-900 mb-6">
-                Product Image
-              </h3>
-              <ImageUpload
-                imagePreview={imagePreview}
-                onImageChange={handleImageChange}
-                onImageRemove={() => setImagePreview(null)}
-                error={imageError ?? undefined}
-              />
-            </div>
-
-            {/* Description Section */}
-            <div className="bg-gray-50 p-6 rounded-lg border border-gray-100">
-              <h3 className="text-lg font-medium text-gray-900 mb-6">
-                Product Description
-              </h3>
-              <Input
-                label="Description"
-                id="description"
-                name="description"
-                type="textarea"
-                required
-                placeholder="Enter product description"
-                className="bg-white min-h-[120px] focus:ring-2 focus:ring-blue-500 transition-all duration-200"
-              />
-            </div>
-          </div>
-
-          {/* Error Message */}
-          {error && (
-            <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-600 text-sm">{error}</p>
-            </div>
-          )}
-
-          {/* Form Actions */}
-          <div className="mt-8 pt-6 border-t border-gray-200 flex justify-end space-x-4">
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={() => router.back()}
-              className="px-6 py-2 hover:bg-gray-100 transition-colors duration-200"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              loading={loading}
-              loadingText="Creating..."
-              className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white transition-colors duration-200"
-              disabled={loading}
-            >
-              Create Product
-            </Button>
-          </div>
-        </form>
+          <CategorySelect
+            value={selectedCategory ?? ""}
+            onChange={setSelectedCategory}
+            label="Category"
+          />
+        </div>
       </div>
-    </FormLayout>
+
+      {/* Image Upload */}
+      <div className="bg-white p-6 rounded-lg shadow-sm">
+        <h3 className="text-lg font-semibold text-gray-800 mb-4">
+          Product Image
+        </h3>
+        <ImageUpload
+          imagePreview={imagePreview}
+          onImageChange={handleImageChange}
+          onImageRemove={() => setImagePreview(null)}
+          error={imageError ?? undefined}
+        />
+      </div>
+
+      {/* Description */}
+      <div className="bg-white p-6 rounded-lg shadow-sm">
+        <h3 className="text-lg font-semibold text-gray-800 mb-4">
+          Product Description
+        </h3>
+        <div className="space-y-2">
+          <textarea
+            id="description"
+            name="description"
+            required
+            placeholder="Enter product description"
+            className="w-full p-3 rounded-lg border border-gray-200 
+                     focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
+                     min-h-[120px] resize-y"
+            rows={4}
+          />
+          <p className="text-sm text-gray-500">
+            Describe your product in detail
+          </p>
+        </div>
+      </div>
+
+      {/* Error Message */}
+      {error && (
+        <div className="p-4 bg-red-50 rounded-lg border border-red-100">
+          <p className="text-sm text-red-600">{error}</p>
+        </div>
+      )}
+
+      {/* Form Actions */}
+      <div className="flex justify-end gap-4 pt-6">
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={() => router.back()}
+          className="px-6 py-2"
+        >
+          Cancel
+        </Button>
+        <Button
+          type="submit"
+          loading={loading}
+          loadingText="Creating..."
+          disabled={loading}
+          className="px-6 py-2 bg-blue-600 text-white hover:bg-blue-700"
+        >
+          Create Product
+        </Button>
+      </div>
+    </form>
+  </div>
   );
 };
 

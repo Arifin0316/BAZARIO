@@ -95,7 +95,7 @@ const EditProdakForm = ({ initialProduct }: EditProdakFormProps) => {
       const response = await updateProdakAction(productData);
 
       if (response.success) {
-        router.push("/prodak");
+        router.push("/dashboard");
         router.refresh();
       } else {
         setError(response.error ?? "An unknown error occurred");

@@ -1,10 +1,10 @@
 'use client';
 
 import { OrderStatus, PaymentStatus } from '@prisma/client';
-import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { Package, Truck, CreditCard, MapPin, Phone, FileText } from 'lucide-react';
+import Link from 'next/link';
 
 interface OrderItem {
   id: string;
@@ -37,7 +37,6 @@ interface Order {
 }
 
 export default function OrderDetail({ order }: { order: Order }) {
-  const router = useRouter();
   const [isClient, setIsClient] = useState(false);
   
   useEffect(() => {
@@ -220,13 +219,12 @@ export default function OrderDetail({ order }: { order: Order }) {
       {/* Actions */}
       <div className="p-6 bg-gray-50">
         <div className="flex justify-end">
-          <button
-            type="button"
-            onClick={() => router.back()}
+          <Link
+            href="/orders"
             className="inline-flex items-center px-6 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
           >
             Back to Orders
-          </button>
+          </Link>
         </div>
       </div>
     </div>

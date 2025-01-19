@@ -41,8 +41,8 @@ const NavbarMenu = ({ session }: NavbarClientProps) => {
         <div className="flex justify-between h-16">
           {/* Logo */}
           <div className="flex-shrink-0 flex items-center">
-            <Link href="/" className="font-bold text-2xl text-gray-800 hover:text-gray-600 transition">
-              logo
+            <Link href="/" className="font-bold uppercase text-2xl text-gray-800 hover:text-gray-600 transition">
+              BAZARIO
             </Link>
           </div>
 
@@ -101,17 +101,29 @@ const NavbarMenu = ({ session }: NavbarClientProps) => {
                     Dashboard
                   </Link>
                   {session.user.role === 'admin' && (
-                    <Link 
-                      href="/user" 
-                      className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition relative
-                        ${isActivePath('/user') 
-                          ? 'text-red-600 after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-red-600' 
-                          : 'text-gray-600 hover:text-gray-900'}`}
-                    >
-                      <Users className="w-4 h-4 mr-2" />
-                      Users
-                    </Link>
-                  )}
+              <>
+                <Link 
+                href="/user" 
+                className={`flex items-center px-3 py-2 rounded-md text-base font-medium ${
+                  isActivePath('/user') ? 'text-red-600 bg-red-50' : 'text-gray-600 hover:text-gray-900'
+                }`}
+                onClick={toggleMenu}
+              >
+                <Users className="w-4 h-4 mr-2" />
+                Users
+              </Link>
+                <Link 
+                href="/dashboard/catagory" 
+                className={`flex items-center px-3 py-2 rounded-md text-base font-medium ${
+                  isActivePath('/user') ? 'text-red-600 bg-red-50' : 'text-gray-600 hover:text-gray-900'
+                }`}
+                onClick={toggleMenu}
+              >
+                <Users className="w-4 h-4 mr-2" />
+                Users
+              </Link>
+              </>
+            )}
                 </>
               )}
             </div>
@@ -241,7 +253,8 @@ const NavbarMenu = ({ session }: NavbarClientProps) => {
               Dashboard
             </Link>
             {session.user.role === 'admin' && (
-              <Link 
+              <>
+                <Link 
                 href="/user" 
                 className={`flex items-center px-3 py-2 rounded-md text-base font-medium ${
                   isActivePath('/user') ? 'text-red-600 bg-red-50' : 'text-gray-600 hover:text-gray-900'
@@ -251,6 +264,17 @@ const NavbarMenu = ({ session }: NavbarClientProps) => {
                 <Users className="w-4 h-4 mr-2" />
                 Users
               </Link>
+                <Link 
+                href="/dashboard/catagory" 
+                className={`flex items-center px-3 py-2 rounded-md text-base font-medium ${
+                  isActivePath('/user') ? 'text-red-600 bg-red-50' : 'text-gray-600 hover:text-gray-900'
+                }`}
+                onClick={toggleMenu}
+              >
+                <Users className="w-4 h-4 mr-2" />
+                Users
+              </Link>
+              </>
             )}
           </>
         )}

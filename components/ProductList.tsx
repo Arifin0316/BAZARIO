@@ -7,6 +7,7 @@ import { Pagination } from './ui/Pagination';
 import { ProdakInterface } from '@/types';
 import ProductListSkeleton from '@/components/sceleton/ProductListSkeleton';
 import ConfirmationModal from '@/components/modals/ConfirmationModal';
+import { Search, Filter } from 'lucide-react';
 import Swal from 'sweetalert2';
 
 const ProductList = () => {
@@ -15,6 +16,8 @@ const ProductList = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [productToDelete, setProductToDelete] = useState<string | null>(null);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [sortBy, setSortBy] = useState<'name' | 'price' | 'stock'>('name');
     const productsPerPage = 5;
 
     useEffect(() => {
@@ -24,15 +27,7 @@ const ProductList = () => {
                 setProdaks(data as ProdakInterface[]);
             } catch (error) {
                 console.error('Error fetching products:', error);
-                Swal.fire({
-                    title: 'Error!',
-                    text: 'Gagal memuat data produk',
-                    icon: 'error',
-                    timer: 1500,
-                    showConfirmButton: false,
-                    position: 'top',
-                    toast: true
-                });
+                showToast('error', 'Gagal memuat data produk');
             } finally {
                 setIsLoading(false);
             }
@@ -40,6 +35,18 @@ const ProductList = () => {
 
         fetchProdaks();
     }, []);
+
+    const showToast = (icon: 'success' | 'error', text: string) => {
+        Swal.fire({
+            title: icon === 'success' ? 'Success!' : 'Error!',
+            text,
+            icon,
+            timer: 1500,
+            showConfirmButton: false,
+            position: 'top',
+            toast: true
+        });
+    };
 
     const openDeleteModal = (id: string) => {
         setProductToDelete(id);
@@ -53,103 +60,125 @@ const ProductList = () => {
 
     const handleDelete = async () => {
         if (!productToDelete) {
-          Swal.fire({
-            title: 'Error!',
-            text: 'No product selected for deletion',
-            icon: 'error',
-            timer: 1500,
-            showConfirmButton: false,
-            position: 'top',
-            toast: true
-          });
-          return;
+            showToast('error', 'No product selected for deletion');
+            return;
         }
-      
+
         try {
-          const result = await deleteProdakAction(productToDelete);
-      
-          if (result.success) {
-            // Update UI state
-            setProdaks(prevProdaks => 
-              prevProdaks.filter(prodak => prodak.id !== productToDelete)
-            );
-      
-            // Show success message
-            Swal.fire({
-              title: 'Success!',
-              text: result.message || 'Product deleted successfully',
-              icon: 'success',
-              timer: 1500,
-              showConfirmButton: false,
-              position: 'top',
-              toast: true
-            });
-          } else {
-            // Show error message from server
-            Swal.fire({
-              title: 'Error!',
-              text: result.error || 'Failed to delete product',
-              icon: 'error',
-              timer: 1500,
-              showConfirmButton: false,
-              position: 'top',
-              toast: true
-            });
-          }
+            const result = await deleteProdakAction(productToDelete);
+
+            if (result.success) {
+                setProdaks(prevProdaks => 
+                    prevProdaks.filter(prodak => prodak.id !== productToDelete)
+                );
+                showToast('success', result.message || 'Product deleted successfully');
+            } else {
+                showToast('error', result.error || 'Failed to delete product');
+            }
         } catch (error) {
-          // Show generic error message for unexpected errors
-          Swal.fire({
-            title: 'Error!',
-            text: 'An unexpected error occurred',
-            icon: 'error',
-            timer: 1500,
-            showConfirmButton: false,
-            position: 'top',
-            toast: true
-          });
-          console.error('Delete operation error:', error);
+            showToast('error', 'An unexpected error occurred');
+            console.error('Delete operation error:', error);
         } finally {
-          closeDeleteModal();
+            closeDeleteModal();
         }
-      };
+    };
+
+    const filteredProducts = prodaks
+        .filter(product => 
+            product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            product.description?.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+        .sort((a, b) => {
+            switch (sortBy) {
+                case 'name':
+                    return a.name.localeCompare(b.name);
+                case 'price':
+                    return a.price - b.price;
+                case 'stock':
+                    return a.stock - b.stock;
+                default:
+                    return 0;
+            }
+        });
+
+    // Calculate pagination
+    const indexOfLastProduct = currentPage * productsPerPage;
+    const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+    const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+    const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
 
     if (isLoading) {
         return <ProductListSkeleton />;
     }
 
-    if (!prodaks?.length) {
-        return (
-            <div className="flex justify-center items-center min-h-[200px]">
-                <h1 className="text-2xl text-gray-500 font-medium">No products found</h1>
-            </div>
-        );
-    }
-
-    // Calculate pagination
-    const indexOfLastProduct = currentPage * productsPerPage;
-    const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-    const currentProducts = prodaks.slice(indexOfFirstProduct, indexOfLastProduct);
-    const totalPages = Math.ceil(prodaks.length / productsPerPage);
-    
     return (
-        <div className="space-y-4 p-4">
-            {currentProducts.map((prodak) => (
-                <ProductCard
-                    key={prodak.id}
-                    product={prodak}
-                    onEdit={prodak.id}
-                    onDelete={() => openDeleteModal(prodak.id)}
-                />
-            ))}
+        <div className="space-y-6">
+            {/* Filters and Search */}
+            <div className="flex flex-col sm:flex-row gap-4 bg-white p-4 rounded-lg shadow-sm">
+                <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                    <input
+                        type="text"
+                        placeholder="Search products..."
+                        className="pl-10 pr-4 py-2 w-full border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
+                <div className="flex items-center gap-2">
+                    <Filter className="text-gray-400 h-5 w-5" />
+                    <select
+                        className="border border-gray-200 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        value={sortBy}
+                        onChange={(e) => setSortBy(e.target.value as 'name' | 'price' | 'stock')}
+                    >
+                        <option value="name">Sort by Name</option>
+                        <option value="price">Sort by Price</option>
+                        <option value="stock">Sort by Stock</option>
+                    </select>
+                </div>
+            </div>
 
-            {totalPages > 1 && (
-                <Pagination 
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={setCurrentPage}
-                />
+            {/* Products List */}
+            {!filteredProducts.length ? (
+                <div className="bg-white rounded-lg shadow-sm p-8 text-center">
+                    <div className="flex flex-col items-center justify-center space-y-4">
+                        <Search className="h-12 w-12 text-gray-400" />
+                        <h3 className="text-lg font-medium text-gray-900">No products found</h3>
+                        <p className="text-gray-500">
+                            {searchTerm ? 
+                                `No products match "${searchTerm}"` : 
+                                'Start by adding your first product'
+                            }
+                        </p>
+                    </div>
+                </div>
+            ) : (
+                <div className="space-y-4">
+                    {currentProducts.map((prodak) => (
+                        <div key={prodak.id} className="transform transition duration-200 hover:scale-[1.01]">
+                            <ProductCard
+                                product={prodak}
+                                onEdit={prodak.id}
+                                onDelete={() => openDeleteModal(prodak.id)}
+                            />
+                        </div>
+                    ))}
+                </div>
             )}
 
+            {/* Pagination */}
+            {totalPages > 1 && (
+                <div className="flex justify-center mt-6">
+                    <Pagination 
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={setCurrentPage}
+                    />
+                </div>
+            )}
+
+            {/* Delete Confirmation Modal */}
             <ConfirmationModal
                 isOpen={isDeleteModalOpen}
                 onClose={closeDeleteModal}

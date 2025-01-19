@@ -289,6 +289,17 @@ export async function updateUserRoleAction(formData: FormData) {
         throw error;
     }
 }
+
+export async function Prodak() {
+  try {
+    const prodak = await prisma.prodak.findMany()
+    return prodak;
+} catch (error) {
+    console.error('Error fetching product:', error);
+    return null;
+}
+}
+
 export async function GetProdakById(id: string) {
     const session = await auth();
     
