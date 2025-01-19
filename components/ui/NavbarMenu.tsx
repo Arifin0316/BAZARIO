@@ -60,16 +60,6 @@ const NavbarMenu = ({ session }: NavbarClientProps) => {
                 Home
               </Link>
               <Link 
-                href="/profile" 
-                className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition relative
-                  ${isActivePath('/profile') 
-                    ? 'text-red-600 after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-red-600' 
-                    : 'text-gray-600 hover:text-gray-900'}`}
-              >
-                <Home className="w-4 h-4 mr-2" />
-                profile
-              </Link>
-              <Link 
                 href="/cart" 
                 className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition relative
                   ${isActivePath('/cart') 
@@ -131,6 +121,7 @@ const NavbarMenu = ({ session }: NavbarClientProps) => {
               {session ? (
                 <div className="flex items-center space-x-4">
                   <div className="flex items-center space-x-3 pr-4 border-r border-gray-200">
+                    <Link href="/profile">
                     <Image 
                       src={session.user.image || '/avatar.svg'} 
                       alt="avatar" 
@@ -138,6 +129,7 @@ const NavbarMenu = ({ session }: NavbarClientProps) => {
                       height={32} 
                       className="rounded-full ring-2 ring-gray-100"
                     />
+                    </Link>
                     <div className="flex flex-col">
                       <span className="text-sm font-medium text-gray-700 capitalize">
                         {session.user.name}

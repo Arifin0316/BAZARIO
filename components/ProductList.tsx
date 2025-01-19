@@ -52,41 +52,66 @@ const ProductList = () => {
     };
 
     const handleDelete = async () => {
-        if (!productToDelete) return;
-
-        try {
-            const result = await deleteProdakAction(productToDelete);
-            if (result.success) {
-                setProdaks(prevProdaks => 
-                    prevProdaks.filter(prodak => prodak.id !== productToDelete)
-                );
-                Swal.fire({
-                    title: 'Berhasil!',
-                    text: 'Produk berhasil dihapus',
-                    icon: 'success',
-                    timer: 1500,
-                    showConfirmButton: false,
-                    position: 'top',
-                    toast: true
-                });
-            } else {
-                throw new Error(result.error || 'Failed to delete product');
-            }
-        } catch (error) {
-            console.error('Error deleting product:', error);
-            Swal.fire({
-                title: 'Error!',
-                text: 'Gagal menghapus produk',
-                icon: 'error',
-                timer: 1500,
-                showConfirmButton: false,
-                position: 'top',
-                toast: true
-            });
-        } finally {
-            closeDeleteModal();
+        if (!productToDelete) {
+          Swal.fire({
+            title: 'Error!',
+            text: 'No product selected for deletion',
+            icon: 'error',
+            timer: 1500,
+            showConfirmButton: false,
+            position: 'top',
+            toast: true
+          });
+          return;
         }
-    };
+      
+        try {
+          const result = await deleteProdakAction(productToDelete);
+      
+          if (result.success) {
+            // Update UI state
+            setProdaks(prevProdaks => 
+              prevProdaks.filter(prodak => prodak.id !== productToDelete)
+            );
+      
+            // Show success message
+            Swal.fire({
+              title: 'Success!',
+              text: result.message || 'Product deleted successfully',
+              icon: 'success',
+              timer: 1500,
+              showConfirmButton: false,
+              position: 'top',
+              toast: true
+            });
+          } else {
+            // Show error message from server
+            Swal.fire({
+              title: 'Error!',
+              text: result.error || 'Failed to delete product',
+              icon: 'error',
+              timer: 1500,
+              showConfirmButton: false,
+              position: 'top',
+              toast: true
+            });
+          }
+        } catch (error) {
+          // Show generic error message for unexpected errors
+          Swal.fire({
+            title: 'Error!',
+            text: 'An unexpected error occurred',
+            icon: 'error',
+            timer: 1500,
+            showConfirmButton: false,
+            position: 'top',
+            toast: true
+          });
+          console.error('Delete operation error:', error);
+        } finally {
+          closeDeleteModal();
+        }
+      };
 
     if (isLoading) {
         return <ProductListSkeleton />;

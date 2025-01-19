@@ -164,41 +164,74 @@ export async function createProdakAction(data: {
     }
 }
 
-export async function deleteProdakAction(id: string) {
-    const session = await auth();
-    
-    if (!session?.user) {
-        return { success: false, error: "Unauthorized" };
+
+export async function deleteProdakAction(productId: string) {
+  if (!productId) {
+    return {
+      success: false,
+      error: "Product ID is required"
+    };
+  }
+  const session = await auth()
+  if (!session?.user?.id) {
+    return {
+      success: false,
+      error: "Unauthorized"
+    };
+  }
+
+  try {
+    // Cek dulu apakah produk ada dan milik user yang sedang login
+    const product = await prisma.prodak.findFirst({
+      where: {
+        id: productId,
+        userId: session.user.id
+      }
+    });
+
+    if (!product) {
+      return {
+        success: false,
+        error: "Product not found or you're not authorized to delete it"
+      };
     }
 
-    try {
-        const prodak = await prisma.prodak.findUnique({
-            where: { id },
-        });
+    // Jika produk ditemukan, lakukan penghapusan
+    await prisma.$transaction(async (tx) => {
+      // 1. Hapus cart items
+      await tx.cartItem.deleteMany({
+        where: { prodakId: productId }
+      });
 
-        if (!prodak) {
-            return { success: false, error: "Product not found" };
-        }
+      // 2. Hapus reviews
+      await tx.review.deleteMany({
+        where: { prodakId: productId }
+      });
 
-        if (session.user.role !== "admin" && prodak.userId !== session.user.id) {
-            return { success: false, error: "Forbidden" };
-        }
+      // 3. Hapus order items
+      await tx.orderItem.deleteMany({
+        where: { prodakId: productId }
+      });
 
-        await prisma.prodak.delete({
-            where: { id },
-        });
+      // 4. Hapus produk
+      await tx.prodak.delete({
+        where: { id: productId }
+      });
+    });
 
-        return { success: true };
-    } catch (error) {
-        console.error('Error deleting product:', error);
-        return { 
-            success: false, 
-            error: error instanceof Error ? error.message : "Failed to delete product" 
-        };
-    }
+    return {
+      success: true,
+      message: "Product deleted successfully"
+    };
+
+  } catch (error) {
+    console.error('Error deleting product:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to delete product"
+    };
+  }
 }
-
-
 export async function deleteUserAction(formData: FormData) {
     const id = formData.get('id') as string;
     const session = await auth();

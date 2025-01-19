@@ -1,38 +1,55 @@
 import ProductCard from '@/components/product/ProductCard';
 import { allProdak } from '@/lib/data';
 import { ProdakInterface1 } from '@/types';
+import { ShoppingBag } from 'lucide-react';
 
 export default async function ProductsList() {
   const products = await allProdak() as unknown as ProdakInterface1[];
 
   if (!products) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <p className="text-center text-gray-500">Failed to load products</p>
+      <div className="min-h-[50vh] flex items-center justify-center">
+        <div className="text-center">
+          <ShoppingBag className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+          <p className="text-xl text-gray-500">Failed to load products</p>
+        </div>
       </div>
     );
   }
 
   if (products.length === 0) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold mb-6">Our Products</h1>
-        <p className="text-center text-gray-500">No products available</p>
+      <div className="container mx-auto px-4 py-12">
+        <div className="text-center">
+          <h1 className="text-3xl font-bold mb-6 text-gray-800">Our Products</h1>
+          <ShoppingBag className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+          <p className="text-xl text-gray-500">No products available</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-6 py-8">
-      <div className="mb-6">
-      </div>
-      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {products.map((product) => (
-          <ProductCard
-            key={product.id}
-            product={product}
-          />
-        ))}
+    <div className="bg-gray-50">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="space-y-8">
+          {/* Header Section */}
+          <div className="text-center">
+            <h1 className="text-3xl font-bold text-gray-800 mb-4">Our Products</h1>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Discover our collection of high-quality products that cater to your needs
+            </p>
+          </div>
+
+          {/* Products Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
+            {products.map((product) => (
+              <div key={product.id} className="transform transition duration-200 hover:scale-105">
+                <ProductCard product={product} />
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
