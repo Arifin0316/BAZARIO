@@ -29,7 +29,7 @@ export interface Review {
 
 
 export interface ProdakInterface1 {
-  rating: number;
+  rating?: number;
   id: string;
   name: string;
   price: number;
