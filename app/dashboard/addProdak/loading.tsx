@@ -1,7 +1,7 @@
 // app/prodak/add/loading.tsx
 export default function Loading() {
   return (
-    <div className="container mx-auto py-8">
+    <div className="container min-h-screen mx-auto py-8">
       {/* Header Skeleton */}
       <div className="mb-8 space-y-2">
         <div className="h-8 w-48 bg-gray-200 rounded-md animate-pulse" />
