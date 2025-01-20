@@ -84,8 +84,8 @@ export default function ProfileForm({ user }: ProfileFormProps) {
   return (
     <div className="space-y-6">
       {/* Profile Form */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-lg font-medium mb-6">Personal Information</h2>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow dark:shadow-xl p-6">
+        <h2 className="text-lg font-medium mb-6 text-gray-900 dark:text-white">Personal Information</h2>
         <form action={handleProfileUpdate} className="space-y-6">
           {/* Profile Image */}
           <div className="flex flex-col items-center space-y-4">
@@ -97,64 +97,64 @@ export default function ProfileForm({ user }: ProfileFormProps) {
                 height={100}
                 className="rounded-full object-cover"
               />
-              <label className="absolute bottom-0 right-0 bg-white rounded-full p-2 shadow-lg cursor-pointer hover:bg-gray-100">
-                <UploadCloud className="w-5 h-5 text-gray-600" />
+              <label className="absolute bottom-0 right-0 bg-white dark:bg-gray-700 rounded-full p-2 shadow-lg dark:shadow-md cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600">
+                <UploadCloud className="w-5 h-5 text-gray-600 dark:text-gray-300" />
                 <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="hidden"
-                name="image"
-                  />
-              <input 
-              type="hidden" 
-              name="imageBase64" 
-              />
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                  name="image"
+                />
+                <input 
+                  type="hidden" 
+                  name="imageBase64" 
+                />
               </label>
             </div>
-            <p className="text-sm text-gray-500">Max file size: 2MB</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Max file size: 2MB</p>
           </div>
 
           {/* Form Fields */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700">Name</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Name</label>
               <input
                 type="text"
                 name="name"
                 defaultValue={user.name || ''}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">Email</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
               <input
                 type="email"
                 name="email"
                 defaultValue={user.email || ''}
                 disabled
-                className="mt-1 block w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-gray-500"
+                className="mt-1 block w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-400"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">Phone Number</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Phone Number</label>
               <input
                 type="tel"
                 name="phoneNumber"
                 defaultValue={user.phoneNumber || ''}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             </div>
             
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700">Address</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Address</label>
               <textarea
                 name="address"
                 rows={3}
                 defaultValue={user.address || ''}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             </div>
           </div>
@@ -163,7 +163,7 @@ export default function ProfileForm({ user }: ProfileFormProps) {
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
             >
               {loading ? 'Saving...' : 'Save Changes'}
             </button>
@@ -172,13 +172,13 @@ export default function ProfileForm({ user }: ProfileFormProps) {
       </div>
 
       {/* Password Form */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow dark:shadow-xl p-6">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-lg font-medium">Password Settings</h2>
+          <h2 className="text-lg font-medium text-gray-900 dark:text-white">Password Settings</h2>
           <button
             type="button"
             onClick={() => setIsEditingPassword(!isEditingPassword)}
-            className="text-sm text-blue-600 hover:text-blue-800"
+            className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
           >
             {isEditingPassword ? 'Cancel' : 'Change Password'}
           </button>
@@ -188,32 +188,32 @@ export default function ProfileForm({ user }: ProfileFormProps) {
           <form action={handlePasswordUpdate} className="space-y-6">
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Current Password</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Current Password</label>
                 <input
                   type="password"
                   name="currentPassword"
                   required
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">New Password</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">New Password</label>
                 <input
                   type="password"
                   name="newPassword"
                   required
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">Confirm New Password</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Confirm New Password</label>
                 <input
                   type="password"
                   name="confirmPassword"
                   required
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
             </div>
@@ -222,7 +222,7 @@ export default function ProfileForm({ user }: ProfileFormProps) {
               <button
                 type="submit"
                 disabled={loading}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
               >
                 {loading ? 'Updating...' : 'Update Password'}
               </button>

@@ -114,21 +114,28 @@ const ProductList = () => {
     return (
         <div className="space-y-6">
             {/* Filters and Search */}
-            <div className="flex flex-col sm:flex-row gap-4 bg-white p-4 rounded-lg shadow-sm">
+            <div className="flex flex-col sm:flex-row gap-4 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm dark:shadow-xl">
                 <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-5 w-5" />
                     <input
                         type="text"
                         placeholder="Search products..."
-                        className="pl-10 pr-4 py-2 w-full border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                        className="pl-10 pr-4 py-2 w-full border border-gray-200 dark:border-gray-700 rounded-lg 
+                                   bg-white dark:bg-gray-700 text-gray-900 dark:text-white
+                                   focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 
+                                   focus:border-blue-500 dark:focus:border-blue-400 
+                                   transition-colors"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
                 <div className="flex items-center gap-2">
-                    <Filter className="text-gray-400 h-5 w-5" />
+                    <Filter className="text-gray-400 dark:text-gray-500 h-5 w-5" />
                     <select
-                        className="border border-gray-200 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="border border-gray-200 dark:border-gray-700 rounded-lg p-2 
+                                   bg-white dark:bg-gray-700 text-gray-900 dark:text-white
+                                   focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 
+                                   focus:border-blue-500 dark:focus:border-blue-400"
                         value={sortBy}
                         onChange={(e) => setSortBy(e.target.value as 'name' | 'price' | 'stock')}
                     >
@@ -141,11 +148,11 @@ const ProductList = () => {
 
             {/* Products List */}
             {!filteredProducts.length ? (
-                <div className="bg-white rounded-lg shadow-sm p-8 text-center">
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:shadow-xl p-8 text-center">
                     <div className="flex flex-col items-center justify-center space-y-4">
-                        <Search className="h-12 w-12 text-gray-400" />
-                        <h3 className="text-lg font-medium text-gray-900">No products found</h3>
-                        <p className="text-gray-500">
+                        <Search className="h-12 w-12 text-gray-400 dark:text-gray-600" />
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-white">No products found</h3>
+                        <p className="text-gray-500 dark:text-gray-400">
                             {searchTerm ? 
                                 `No products match "${searchTerm}"` : 
                                 'Start by adding your first product'

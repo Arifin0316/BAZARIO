@@ -2,6 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  color-scheme: light;
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+/* Tambahkan transisi halus untuk perubahan tema */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
 
 .loader {
     border: 2px solid transparent;

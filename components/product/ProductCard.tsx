@@ -21,7 +21,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   if (!isClient) return null;
 
   return (
-    <div className="bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-xl dark:hover:shadow-2xl transition-all duration-300 overflow-hidden group">
       <Link href={`/prodak/${product.id}`} className="block relative">
         <div className="relative w-full pt-[100%] overflow-hidden">
           {product.image ? (
@@ -33,8 +33,8 @@ export default function ProductCard({ product }: ProductCardProps) {
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
           ) : (
-            <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
-              <ImageOff className="w-12 h-12 text-gray-400" />
+            <div className="absolute inset-0 bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+              <ImageOff className="w-12 h-12 text-gray-400 dark:text-gray-500" />
             </div>
           )}
           {/* Badge Container */}
@@ -55,14 +55,14 @@ export default function ProductCard({ product }: ProductCardProps) {
 
       <div className="p-4 space-y-3">
         <div className="min-h-[2.5rem]">
-          <Link href={`/products/${product.id}`} className="block">
-            <h3 className="text-lg font-semibold text-gray-800 hover:text-blue-600 transition-colors duration-200 truncate">
+          <Link href={`/prodak/${product.id}`} className="block">
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 truncate">
               {product.name}
             </h3>
           </Link>
 
           {product.description && (
-            <p className="text-gray-600 text-sm mt-1 line-clamp-2 min-h-[2.5rem]">
+            <p className="text-gray-600 dark:text-gray-300 text-sm mt-1 line-clamp-2 min-h-[2.5rem]">
               {product.description}
             </p>
           )}
@@ -70,11 +70,11 @@ export default function ProductCard({ product }: ProductCardProps) {
 
         <div className="flex items-center justify-between pt-2">
           <div className="space-y-1">
-            <div className="text-xl font-bold text-gray-900">
+            <div className="text-xl font-bold text-gray-900 dark:text-white">
               Rp {product.price.toLocaleString()}
             </div>
-            <div className="text-sm text-gray-500 flex items-center gap-1">
-              Stock: <span className="font-medium">{product.stock}</span>
+            <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
+              Stock: <span className="font-medium text-gray-700 dark:text-gray-200">{product.stock}</span>
             </div>
           </div>
         </div>

@@ -90,15 +90,15 @@ export default function CheckoutForm({ cart }: CartProp) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Shipping Information */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-100">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
         <div className="p-6">
-          <h2 className="flex items-center gap-2 text-lg font-semibold text-gray-900 mb-6">
-            <MapPin className="w-5 h-5 text-blue-600" />
+          <h2 className="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-white mb-6">
+            <MapPin className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             Shipping Information
           </h2>
           <div className="space-y-6">
             <div>
-              <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="address" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Shipping Address <span className="text-red-500">*</span>
               </label>
               <textarea
@@ -106,39 +106,45 @@ export default function CheckoutForm({ cart }: CartProp) {
                 name="address"
                 required
                 rows={3}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-lg 
+                           bg-white dark:bg-gray-700 text-gray-900 dark:text-white
+                           focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 placeholder="Enter your complete shipping address"
               />
             </div>
 
             <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Phone Number <span className="text-red-500">*</span>
               </label>
               <div className="relative">
-                <PhoneCall className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <PhoneCall className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
                 <input
                   type="tel"
                   id="phone"
                   name="phone"
                   required
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 dark:border-gray-600 rounded-lg 
+                             bg-white dark:bg-gray-700 text-gray-900 dark:text-white
+                             focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   placeholder="Enter your phone number"
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="notes" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Order Notes (Optional)
               </label>
               <div className="relative">
-                <FileText className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                <FileText className="absolute left-3 top-3 w-5 h-5 text-gray-400 dark:text-gray-500" />
                 <textarea
                   id="notes"
                   name="notes"
                   rows={2}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 dark:border-gray-600 rounded-lg 
+                             bg-white dark:bg-gray-700 text-gray-900 dark:text-white
+                             focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   placeholder="Add any special notes for your order"
                 />
               </div>
@@ -148,10 +154,10 @@ export default function CheckoutForm({ cart }: CartProp) {
       </div>
 
       {/* Shipping Method */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-100">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
         <div className="p-6">
-          <h2 className="flex items-center gap-2 text-lg font-semibold text-gray-900 mb-6">
-            <Truck className="w-5 h-5 text-blue-600" />
+          <h2 className="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-white mb-6">
+            <Truck className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             Shipping Method
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -160,8 +166,8 @@ export default function CheckoutForm({ cart }: CartProp) {
                 key={method.id}
                 className={`flex items-center justify-between p-4 border rounded-lg cursor-pointer transition-all duration-200
                   ${selectedShipping.id === method.id
-                    ? 'border-blue-500 bg-blue-50 ring-2 ring-blue-100'
-                    : 'border-gray-200 hover:border-blue-200'
+                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30 ring-2 ring-blue-100 dark:ring-blue-700'
+                    : 'border-gray-200 dark:border-gray-600 hover:border-blue-200 dark:hover:border-blue-500'
                   }`}
               >
                 <div className="flex items-center">
@@ -171,18 +177,18 @@ export default function CheckoutForm({ cart }: CartProp) {
                     value={method.id}
                     checked={selectedShipping.id === method.id}
                     onChange={() => setSelectedShipping(method)}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500"
+                    className="h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500"
                   />
                   <div className="ml-3">
-                    <span className="block text-sm font-medium text-gray-900">
+                    <span className="block text-sm font-medium text-gray-900 dark:text-white">
                       {method.name}
                     </span>
-                    <span className="block text-sm text-gray-500">
+                    <span className="block text-sm text-gray-500 dark:text-gray-400">
                       Est. {method.estimatedDays} days
                     </span>
                   </div>
                 </div>
-                <span className="text-sm font-medium text-gray-900">
+                <span className="text-sm font-medium text-gray-900 dark:text-white">
                   Rp {method.cost.toLocaleString()}
                 </span>
               </label>
@@ -192,25 +198,25 @@ export default function CheckoutForm({ cart }: CartProp) {
       </div>
 
       {/* Order Summary */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-100">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
         <div className="p-6">
-          <h2 className="flex items-center gap-2 text-lg font-semibold text-gray-900 mb-6">
-            <Package className="w-5 h-5 text-blue-600" />
+          <h2 className="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-white mb-6">
+            <Package className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             Order Summary
           </h2>
           <div className="space-y-4">
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Subtotal</span>
-              <span className="font-medium">Rp {subtotal.toLocaleString()}</span>
+              <span className="text-gray-600 dark:text-gray-400">Subtotal</span>
+              <span className="font-medium text-gray-900 dark:text-white">Rp {subtotal.toLocaleString()}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Shipping Cost</span>
-              <span className="font-medium">Rp {selectedShipping.cost.toLocaleString()}</span>
+              <span className="text-gray-600 dark:text-gray-400">Shipping Cost</span>
+              <span className="font-medium text-gray-900 dark:text-white">Rp {selectedShipping.cost.toLocaleString()}</span>
             </div>
-            <div className="pt-4 border-t border-gray-200">
+            <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
               <div className="flex justify-between items-center">
-                <span className="font-medium text-gray-900">Total</span>
-                <span className="font-bold text-xl text-blue-600">
+                <span className="font-medium text-gray-900 dark:text-white">Total</span>
+                <span className="font-bold text-xl text-blue-600 dark:text-blue-400">
                   Rp {(subtotal + selectedShipping.cost + tax).toLocaleString()}
                 </span>
               </div>
@@ -224,7 +230,10 @@ export default function CheckoutForm({ cart }: CartProp) {
         <button
           type="button"
           onClick={() => router.back()}
-          className="flex items-center px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+          className="flex items-center px-6 py-2.5 border border-gray-300 dark:border-gray-600 
+                     rounded-lg text-gray-700 dark:text-gray-200 
+                     hover:bg-gray-50 dark:hover:bg-gray-700 
+                     transition-colors"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back
@@ -235,7 +244,7 @@ export default function CheckoutForm({ cart }: CartProp) {
           className={`px-6 py-2.5 bg-blue-600 text-white rounded-lg font-medium
             ${loading
               ? 'opacity-50 cursor-not-allowed'
-              : 'hover:bg-blue-700 transform hover:shadow-lg transition-all duration-200'
+              : 'hover:bg-blue-700 dark:hover:bg-blue-500 transform hover:shadow-lg transition-all duration-200'
             }`}
         >
           {loading ? 'Processing...' : 'Place Order'}

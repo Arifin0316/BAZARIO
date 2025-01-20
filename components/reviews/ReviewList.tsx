@@ -70,15 +70,15 @@ export default function ReviewList({ productId, reviews, userReview, userId }: R
     ? (reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length).toFixed(1)
     : '0.0';
   
-    const displayedReviews = showAllReviews ? reviews : reviews.slice(0, 1);
+  const displayedReviews = showAllReviews ? reviews : reviews.slice(0, 1);
   return (
-    <div className="mt-8">
-      <h2 className="text-2xl font-bold mb-6">Customer Reviews</h2>
+    <div className="mt-8 p-4">
+      <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Customer Reviews</h2>
 
       {/* Review Summary */}
-      <div className="bg-white rounded-lg shadow p-6 mb-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow dark:shadow-xl p-6 mb-6">
         <div className="flex items-center gap-4">
-          <div className="text-4xl font-bold">{averageRating}</div>
+          <div className="text-4xl font-bold text-gray-900 dark:text-white">{averageRating}</div>
           <div>
             <div className="flex items-center">
               {[1, 2, 3, 4, 5].map((star) => (
@@ -87,12 +87,12 @@ export default function ReviewList({ productId, reviews, userReview, userId }: R
                   className={`w-5 h-5 ${
                     star <= Math.round(Number(averageRating))
                       ? 'text-yellow-400 fill-yellow-400'
-                      : 'text-gray-300'
+                      : 'text-gray-300 dark:text-gray-600'
                   }`}
                 />
               ))}
             </div>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
               Based on {reviews.length} review{reviews.length !== 1 ? 's' : ''}
             </p>
           </div>
@@ -101,11 +101,11 @@ export default function ReviewList({ productId, reviews, userReview, userId }: R
 
       {/* Add Review Form */}
       {userId && !userReview && (
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h3 className="text-lg font-semibold mb-4">Write a Review</h3>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow dark:shadow-xl p-6 mb-6">
+          <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Write a Review</h3>
           <form onSubmit={handleSubmitReview} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Rating</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Rating</label>
               <div className="flex items-center gap-2">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
@@ -118,7 +118,7 @@ export default function ReviewList({ productId, reviews, userReview, userId }: R
                       className={`w-6 h-6 ${
                         star <= rating
                           ? 'text-yellow-400 fill-yellow-400'
-                          : 'text-gray-300'
+                          : 'text-gray-300 dark:text-gray-600'
                       }`}
                     />
                   </button>
@@ -127,12 +127,14 @@ export default function ReviewList({ productId, reviews, userReview, userId }: R
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Comment</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Comment</label>
               <textarea
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
                 rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
+                           bg-white dark:bg-gray-700 text-gray-900 dark:text-white
+                           focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-400"
                 placeholder="Share your thoughts about the product..."
               />
             </div>
@@ -140,7 +142,9 @@ export default function ReviewList({ productId, reviews, userReview, userId }: R
             <button
               type="submit"
               disabled={loading || rating === 0}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white 
+                         dark:bg-blue-500 dark:hover:bg-blue-600 
+                         rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Submitting...' : 'Submit Review'}
             </button>
@@ -151,7 +155,7 @@ export default function ReviewList({ productId, reviews, userReview, userId }: R
       {/* Reviews List */}
       <div className="space-y-6">
         {displayedReviews.map((review) => (
-          <div key={review.id} className="bg-white rounded-lg shadow p-6">
+          <div key={review.id} className="bg-white dark:bg-gray-800 rounded-lg shadow dark:shadow-xl p-6">
             <div className="flex items-center gap-4 mb-4">
               <Image
                 src={review.user.image || '/avatar.svg'}
@@ -161,8 +165,8 @@ export default function ReviewList({ productId, reviews, userReview, userId }: R
                 className="rounded-full"
               />
               <div>
-                <p className="font-medium">{review.user.name || 'Anonymous'}</p>
-                <p className="text-sm text-gray-500">
+                <p className="font-medium text-gray-900 dark:text-white">{review.user.name || 'Anonymous'}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   {formatDate(review.createdAt.toString())}
                 </p>
               </div>
@@ -175,30 +179,35 @@ export default function ReviewList({ productId, reviews, userReview, userId }: R
                   className={`w-5 h-5 ${
                     star <= review.rating
                       ? 'text-yellow-400 fill-yellow-400'
-                      : 'text-gray-300'
+                      : 'text-gray-300 dark:text-gray-600'
                   }`}
                 />
               ))}
             </div>
 
             {review.comment && (
-              <p className="text-gray-700">{review.comment}</p>
+              <p className="text-gray-700 dark:text-gray-300">{review.comment}</p>
             )}
           </div>
         ))}
 
         {reviews.length === 0 ? (
-          <p className="text-center text-gray-500 py-6">
+          <p className="text-center text-gray-500 dark:text-gray-400 py-6">
             No reviews yet. Be the first to review this product!
           </p>
         ) : reviews.length > 1 && (
           <div className="text-center">
             <button
               onClick={() => setShowAllReviews(!showAllReviews)}
-              className="inline-flex items-center justify-center px-6 py-2 border border-gray-300 
-                         rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white 
-                         hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 
-                         focus:ring-blue-500 transition-colors duration-200"
+              className="inline-flex items-center justify-center px-6 py-2 
+                         border border-gray-300 dark:border-gray-600
+                         rounded-md shadow-sm text-sm font-medium 
+                         text-gray-700 dark:text-gray-200 
+                         bg-white dark:bg-gray-800 
+                         hover:bg-gray-50 dark:hover:bg-gray-700
+                         focus:outline-none focus:ring-2 focus:ring-offset-2 
+                         focus:ring-blue-500 dark:focus:ring-blue-400
+                         transition-colors duration-200"
             >
               {showAllReviews ? 'Show Less' : `View All Reviews (${reviews.length})`}
             </button>
