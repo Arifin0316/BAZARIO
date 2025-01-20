@@ -165,6 +165,7 @@ const NavbarMenu = ({ session }: NavbarClientProps) => {
                   <p className="text-sm font-medium text-gray-900 dark:text-white">{session.user.name}</p>
                   <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">{session.user.role}</p>
                 </div>
+                <ThemeToggle />
               </div>
               <form action={handleSignOut}>
                 <button

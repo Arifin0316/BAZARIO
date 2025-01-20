@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { auth } from '@/auth';
 import { Facebook, Instagram, Twitter, Mail, Phone, MapPin, ExternalLink } from 'lucide-react';
 
 const socialLinks = [
@@ -27,7 +28,9 @@ const contactInfo = [
   { icon: Mail, text: 'support@bazario.com' },
 ];
 
-export default function Footer() {
+export default async function Footer() {
+  const sessen = await auth()
+  if(!sessen) return null
   return (
     <footer className="bg-gray-50 dark:bg-gray-900">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

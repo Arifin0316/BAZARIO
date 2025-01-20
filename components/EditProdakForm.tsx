@@ -1,13 +1,23 @@
-'use client';
+"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { ImageUpload } from '@/components/ui/ImageUpload';
-import { FormLayout } from '@/components/ui/FormLayout';
+import { 
+  Package, 
+  DollarSign, 
+  LayoutGrid, 
+  ShoppingCart, 
+  AlertCircle, 
+  ArrowLeft, 
+  Save,
+  FileEdit,
+  History 
+} from "lucide-react";
 import { updateProdakAction } from "@/lib/data";
-import CategorySelect from "./ui/CategorySelect";
+import {Input} from '@/components/ui/input'
+import { ImageUpload } from "@/components/ui/ImageUpload";
+import  CategorySelect  from "@/components/ui/CategorySelect";
+import { formatDate } from "@/lib/utils";
 
 interface ProdakInterface {
   id: string;
@@ -33,14 +43,11 @@ const EditProdakForm = ({ initialProduct }: EditProdakFormProps) => {
   const [error, setError] = useState<string | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(initialProduct.image);
   const [imageError, setImageError] = useState<string | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(initialProduct.categoryId);
   const [priceValue, setPriceValue] = useState<string>(initialProduct.price.toLocaleString());
 
   const formatPrice = (value: string) => {
-    // Hapus semua karakter non-digit
     const numbers = value.replace(/\D/g, "");
-    
-    // Format angka dengan koma
     return numbers.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   };
 
@@ -70,10 +77,8 @@ const EditProdakForm = ({ initialProduct }: EditProdakFormProps) => {
     setLoading(true);
     setError(null);
 
-    const formData = new FormData(e.currentTarget);
-
     try {
-      // Hapus koma dari nilai price sebelum parsing
+      const formData = new FormData(e.currentTarget);
       const priceStr = priceValue.replace(/,/g, "");
       const price = parseFloat(priceStr);
       const stock = parseInt(formData.get("stock") as string);
@@ -109,29 +114,51 @@ const EditProdakForm = ({ initialProduct }: EditProdakFormProps) => {
   };
 
   return (
-    <FormLayout
-    title="Edit Product"
-    subtitle="Update your product details below."
-    error={error}
-  >
-    <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-sm">
-      <form onSubmit={handleSubmit} className="p-8">
-        <div className="space-y-8">
-          {/* Product Details Section */}
-          <div className="bg-gray-50 p-6 rounded-lg border border-gray-100">
-            <h3 className="text-lg font-medium text-gray-900 mb-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="mb-8 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <button
+              type="button"
+              onClick={() => router.back()}
+              className="p-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300
+                       bg-white dark:bg-gray-800 rounded-lg shadow-sm
+                       hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <FileEdit className="w-6 h-6 text-blue-500" />
+                Edit Product
+              </h1>
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                <History className="w-4 h-4" />
+                Last updated: {formatDate(initialProduct.updatedAt.toString())}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Product Details */}
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+              <Package className="w-5 h-5 text-blue-500" />
               Product Details
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Input
                 label="Product Name"
                 id="name"
                 name="name"
                 type="text"
                 required
-                placeholder="Enter product name"
                 defaultValue={initialProduct.name}
-                className="bg-white focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+                placeholder="Enter product name"
+                startIcon={<LayoutGrid className="w-5 h-5" />}
               />
 
               <Input
@@ -140,10 +167,10 @@ const EditProdakForm = ({ initialProduct }: EditProdakFormProps) => {
                 name="price"
                 type="text"
                 required
-                placeholder="Enter price"
+                placeholder="0"
                 value={priceValue}
                 onChange={handlePriceChange}
-                className="bg-white focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+                startIcon={<DollarSign className="w-5 h-5" />}
               />
 
               <Input
@@ -153,9 +180,9 @@ const EditProdakForm = ({ initialProduct }: EditProdakFormProps) => {
                 type="number"
                 required
                 min="0"
-                placeholder="Enter stock quantity"
                 defaultValue={initialProduct.stock}
-                className="bg-white focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+                placeholder="Enter stock quantity"
+                startIcon={<ShoppingCart className="w-5 h-5" />}
               />
 
               <CategorySelect
@@ -167,11 +194,13 @@ const EditProdakForm = ({ initialProduct }: EditProdakFormProps) => {
             </div>
           </div>
 
-          {/* Image Upload Section */}
-          <div className="bg-gray-50 p-6 rounded-lg border border-gray-100 w-full sm:w-[50%] md:w-[40%]">
-            <h3 className="text-lg font-medium text-gray-900 mb-6">
+          {/* Image Upload */}
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+              <Package className="w-5 h-5 text-blue-500" />
               Product Image
             </h3>
+            
             <ImageUpload
               imagePreview={imagePreview}
               onImageChange={handleImageChange}
@@ -180,54 +209,86 @@ const EditProdakForm = ({ initialProduct }: EditProdakFormProps) => {
             />
           </div>
 
-          {/* Description Section */}
-          <div className="bg-gray-50 p-6 rounded-lg border border-gray-100">
-            <h3 className="text-lg font-medium text-gray-900 mb-6">
+          {/* Description */}
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+              <Package className="w-5 h-5 text-blue-500" />
               Product Description
             </h3>
-            <Input
-              label="Description"
-              id="description"
-              name="description"
-              type="textarea"
-              required
-              placeholder="Enter product description"
-              defaultValue={initialProduct.description ?? ""}
-              className="bg-white min-h-[120px] focus:ring-2 focus:ring-blue-500 transition-all duration-200"
-            />
+            
+            <div className="space-y-2">
+              <textarea
+                id="description"
+                name="description"
+                required
+                defaultValue={initialProduct.description ?? ""}
+                placeholder="Describe your product in detail..."
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600
+                         bg-white dark:bg-gray-800 text-gray-900 dark:text-white
+                         placeholder-gray-400 dark:placeholder-gray-500
+                         focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                         min-h-[120px] resize-y"
+                rows={4}
+              />
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Provide a detailed description of your product to help customers understand its features and benefits
+              </p>
+            </div>
           </div>
-        </div>
 
-        {/* Error Message */}
-        {error && (
-          <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-red-600 text-sm">{error}</p>
+          {/* Error Message */}
+          {error && (
+            <div className="p-4 bg-red-50 dark:bg-red-900/30 rounded-lg border border-red-200 dark:border-red-800
+                          flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-red-500 dark:text-red-400 mt-0.5" />
+              <div className="flex-1">
+                <p className="text-sm font-medium text-red-800 dark:text-red-300">
+                  There was an error updating the product
+                </p>
+                <p className="text-sm text-red-700 dark:text-red-400 mt-1">{error}</p>
+              </div>
+            </div>
+          )}
+
+          {/* Form Actions */}
+          <div className="flex justify-end gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <button
+              type="button"
+              onClick={() => router.back()}
+              className="px-6 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600
+                       text-gray-700 dark:text-gray-200 font-medium
+                       hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors
+                       flex items-center gap-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Cancel
+            </button>
+            
+            <button
+              type="submit"
+              disabled={loading}
+              className="px-6 py-2.5 rounded-lg bg-blue-600 text-white font-medium
+                       hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed
+                       transition-colors flex items-center gap-2"
+            >
+              {loading ? (
+                <>
+                  <span className="animate-spin">
+                    <Package className="w-4 h-4" />
+                  </span>
+                  <span>Updating...</span>
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4" />
+                  <span>Update Product</span>
+                </>
+              )}
+            </button>
           </div>
-        )}
-
-        {/* Form Actions */}
-        <div className="mt-8 pt-6 border-t border-gray-200 flex justify-end space-x-4">
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={() => router.back()}
-            className="px-6 py-2 hover:bg-gray-100 transition-colors duration-200"
-          >
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            loading={loading}
-            loadingText="Updating..."
-            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white transition-colors duration-200"
-            disabled={loading}
-          >
-            Update Product
-          </Button>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
-  </FormLayout>
   );
 };
 

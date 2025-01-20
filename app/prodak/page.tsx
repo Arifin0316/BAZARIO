@@ -16,25 +16,22 @@ export default async function ProductsPage({ searchParams }: PageProps) {
   const products = await allProdak(search) as unknown as ProdakInterface1[];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-        {/* Header Section */}
-        <div className="max-w-3xl mx-auto text-center mb-12">
-          <div className="flex justify-center mb-4">
-            <Package className="w-12 h-12 text-blue-600 dark:text-blue-400" />
-          </div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-            Our Products
-          </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">
-            Discover our collection of high-quality products
-          </p>
-          
-          {/* Search Bar */}
-          <div className="max-w-xl mx-auto">
-            <SearchBar defaultValue={search} />
-          </div>
-        </div>
+    <div className="min-h-screen px-4 md:px-8 bg-gray-50 dark:bg-gray-900">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-8 flex flex-col items-center">
+  {/* Header Section */}
+  <div className="max-w-3xl text-center mb-12">
+    <div className="flex justify-center mb-4">
+      <Package className="w-12 h-12 text-blue-600 dark:text-blue-400" />
+    </div>
+    <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+      Our Products
+    </h1>
+    {/* Search Bar */}
+    <div className="w-full max-w-xl">
+      <SearchBar defaultValue={search} />
+    </div>
+  </div>
+</div>
 
         {/* Results Section */}
         {products.length === 0 ? (
@@ -127,6 +124,5 @@ export default async function ProductsPage({ searchParams }: PageProps) {
           </div>
         </div>
       </div>
-    </div>
   );
 }
