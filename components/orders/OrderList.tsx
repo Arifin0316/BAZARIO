@@ -55,6 +55,17 @@ export default function OrderList({ orders }: { orders: Order[] }) {
     return colors[status];
   };
 
+  const getStatusIcon = (status: OrderStatus) => {
+    const icons = {
+      PENDING: '⏳',
+      PROCESSING: '⚙️',
+      SHIPPED: '📦',
+      DELIVERED: '✅',
+      CANCELLED: '❌'
+    };
+    return icons[status];
+  };
+
   const getPaymentStatusColor = (status: PaymentStatus) => {
     const colors = {
       UNPAID: 'bg-red-100 text-red-800',
@@ -90,42 +101,57 @@ export default function OrderList({ orders }: { orders: Order[] }) {
 
   return (
     <div className="space-y-6">
-      {/* Filter */}
-      <div className="flex gap-2">
+    {/* Scrollable Filter Buttons */}
+    <div className="overflow-x-auto pb-4">
+      <div className="flex space-x-3 min-w-max px-1">
         <button
           onClick={() => setFilter('ALL')}
-          className={`px-4 py-2 rounded-lg text-sm font-medium ${
-            filter === 'ALL' 
-              ? 'bg-gray-900 text-white' 
-              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-          }`}
+          className={`
+            flex items-center space-x-2 px-5 py-2.5 rounded-lg
+            transform transition-all duration-200
+            shadow-sm hover:shadow-md
+            text-sm font-medium whitespace-nowrap
+            ${filter === 'ALL'
+              ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white scale-[1.02]'
+              : 'bg-white text-gray-700 hover:bg-gray-50 hover:scale-[1.02]'
+            }
+          `}
         >
-          All
+          <span>All Orders</span>
         </button>
+
         {Object.values(OrderStatus).map((status) => (
           <button
             key={status}
             onClick={() => setFilter(status)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium ${
-              filter === status 
-                ? 'bg-gray-900 text-white' 
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
+            className={`
+              flex items-center space-x-2 px-5 py-2.5 rounded-lg
+              transform transition-all duration-200
+              shadow-sm hover:shadow-md
+              text-sm font-medium whitespace-nowrap
+              ${filter === status
+                ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white scale-[1.02]'
+                : 'bg-white text-gray-700 hover:bg-gray-50 hover:scale-[1.02]'
+              }
+            `}
           >
-            {status}
+            <span>{getStatusIcon(status)}</span>
+            <span>{status.charAt(0) + status.slice(1).toLowerCase()}</span>
           </button>
         ))}
       </div>
+    </div>
 
-      {/* Orders List */}
-      <div className="space-y-4">
-        {filteredOrders.map((order) => (
-          <div key={order.id} className="bg-white rounded-lg shadow p-6">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+    {/* Orders List */}
+    <div className="space-y-4">
+      {filteredOrders.map((order) => (
+        <div key={order.id} className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
+          <div className="p-6">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
                 <Link 
                   href={`/orders/${order.id}`}
-                  className="text-lg font-medium text-blue-600 hover:text-blue-800"
+                  className="text-lg font-medium text-gray-900 hover:text-blue-600 transition-colors"
                 >
                   Order #{order.id.slice(-8)}
                 </Link>
@@ -133,9 +159,9 @@ export default function OrderList({ orders }: { orders: Order[] }) {
                   {new Date(order.createdAt).toLocaleDateString()}
                 </p>
               </div>
-              <div className="flex gap-2 mt-2 md:mt-0">
+              <div className="flex items-center gap-2">
                 <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
-                  {order.status}
+                  {getStatusIcon(order.status)} {order.status}
                 </span>
                 <span className={`px-3 py-1 rounded-full text-xs font-medium ${getPaymentStatusColor(order.paymentStatus)}`}>
                   {order.paymentStatus}
@@ -144,80 +170,85 @@ export default function OrderList({ orders }: { orders: Order[] }) {
             </div>
 
             {order.status === 'PENDING' && order.paymentStatus === 'UNPAID' && (
-                  <button
-                    onClick={() => handleCancelOrder(order.id)}
-                    disabled={cancellingOrder === order.id}
-                    className={`px-3 py-1 text-xs font-medium rounded-md 
-                      ${cancellingOrder === order.id
-                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                        : 'bg-red-50 text-red-600 hover:bg-red-100 transition-colors'
-                      }`}
-                  >
-                    {cancellingOrder === order.id ? 'Cancelling...' : 'Cancel Order'}
-                  </button>
-                )}
-
-            <div className="border-t border-gray-200 pt-4">
-              <div className="flow-root">
-                <ul className="-my-4 divide-y divide-gray-200">
-                  {order.orderItems.map((item) => (
-                    <li key={item.id} className="py-4 flex items-center">
-                      <div className="flex-shrink-0 w-16 h-16 bg-gray-100 rounded-md overflow-hidden relative">
-                        {item.prodak.image ? (
-                          <Image
-                            src={item.prodak.image}
-                            alt={item.prodak.name}
-                            width={100}
-                            height={100}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-gray-400">
-                            No Image
-                          </div>
-                        )}
-                      </div>
-                      <div className="ml-4 flex-1">
-                        <p className="text-sm font-medium text-gray-900">
-                          {item.prodak.name}
-                        </p>
-                        <p className="text-sm text-gray-500 mt-1">
-                          Quantity: {item.quantity} × Rp {item.price.toLocaleString()}
-                        </p>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
+              <div className="mt-4">
+                <button
+                  onClick={() => handleCancelOrder(order.id)}
+                  disabled={cancellingOrder === order.id}
+                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-all
+                    ${cancellingOrder === order.id
+                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                      : 'bg-red-50 text-red-600 hover:bg-red-100'
+                    }`}
+                >
+                  {cancellingOrder === order.id ? 'Cancelling...' : 'Cancel Order'}
+                </button>
               </div>
+            )}
+
+            {/* Order Items */}
+            <div className="mt-6 border-t border-gray-100 pt-6">
+              <ul className="divide-y divide-gray-100">
+                {order.orderItems.map((item) => (
+                  <li key={item.id} className="py-4 flex items-center">
+                    <div className="flex-shrink-0 w-16 h-16 bg-gray-50 rounded-lg overflow-hidden">
+                      {item.prodak.image ? (
+                        <Image
+                          src={item.prodak.image}
+                          alt={item.prodak.name}
+                          width={100}
+                          height={100}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-gray-400">
+                          No Image
+                        </div>
+                      )}
+                    </div>
+                    <div className="ml-4 flex-1">
+                      <p className="text-sm font-medium text-gray-900">
+                        {item.prodak.name}
+                      </p>
+                      <p className="text-sm text-gray-500 mt-1">
+                        {item.quantity} × Rp {item.price.toLocaleString()}
+                      </p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
             </div>
 
-            <div className="border-t border-gray-200 pt-4 mt-4">
-              <div className="flex justify-between text-sm">
-                <span className="font-medium text-gray-600">Total Amount</span>
-                <span className="font-bold text-gray-900">
-                  Rp {order.totalAmount.toLocaleString()}
-                </span>
-              </div>
-              {order.trackingNumber && (
-                <div className="flex justify-between text-sm mt-2">
-                  <span className="font-medium text-gray-600">Tracking Number</span>
-                  <span className="text-gray-900">{order.trackingNumber}</span>
+            {/* Order Summary */}
+            <div className="mt-6 border-t border-gray-100 pt-6">
+              <dl className="space-y-3 text-sm">
+                <div className="flex justify-between">
+                  <dt className="font-medium text-gray-500">Total Amount</dt>
+                  <dd className="font-bold text-gray-900">
+                    Rp {order.totalAmount.toLocaleString()}
+                  </dd>
                 </div>
-              )}
-              <div className="flex justify-between text-sm mt-2">
-                <span className="font-medium text-gray-600">Shipping Method</span>
-                <span className="text-gray-900">{order.shippingMethod}</span>
-              </div>
+                {order.trackingNumber && (
+                  <div className="flex justify-between">
+                    <dt className="font-medium text-gray-500">Tracking Number</dt>
+                    <dd className="text-gray-900">{order.trackingNumber}</dd>
+                  </div>
+                )}
+                <div className="flex justify-between">
+                  <dt className="font-medium text-gray-500">Shipping Method</dt>
+                  <dd className="text-gray-900">{order.shippingMethod}</dd>
+                </div>
+              </dl>
             </div>
           </div>
-        ))}
+        </div>
+      ))}
 
-        {filteredOrders.length === 0 && (
-          <div className="text-center py-12 bg-white rounded-lg shadow">
-            <p className="text-gray-500">No orders found</p>
-          </div>
-        )}
-      </div>
+      {filteredOrders.length === 0 && (
+        <div className="text-center py-12 bg-white rounded-lg shadow-sm border border-gray-100">
+          <p className="text-gray-500">No orders found</p>
+        </div>
+      )}
     </div>
-  );
+  </div>
+);
 }

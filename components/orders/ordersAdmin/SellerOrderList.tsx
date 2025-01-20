@@ -91,30 +91,60 @@ export default function SellerOrderList({ orders }: { orders: Order[] }) {
     <div className="space-y-6">
       {/* Filter Tabs */}
       <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-        <div className="flex flex-wrap gap-2">
+  <div className="overflow-x-auto pb-2">
+    <div className="flex space-x-3 min-w-max px-1">
+      <button
+        onClick={() => setFilter('ALL')}
+        className={`
+          flex items-center space-x-2 px-5 py-2.5 rounded-lg
+          transform transition-all duration-200
+          shadow-sm hover:shadow-md
+          text-sm font-medium whitespace-nowrap
+          ${filter === 'ALL'
+            ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white scale-[1.02]'
+            : 'bg-white text-gray-700 hover:bg-gray-50 hover:scale-[1.02]'
+          }
+        `}
+      >
+        <Package className="w-4 h-4" />
+        <span>All Orders</span>
+      </button>
+
+      {Object.values(OrderStatus).map((status) => {
+        const getStatusIcon = (status: OrderStatus) => {
+          const icons = {
+            PENDING: '⏳',
+            PROCESSING: '⚙️',
+            SHIPPED: '📦',
+            DELIVERED: '✅',
+            CANCELLED: '❌'
+          };
+          return icons[status];
+        };
+
+        return (
           <button
-            onClick={() => setFilter('ALL')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors
-              ${filter === 'ALL' 
-                ? 'bg-gray-900 text-white' 
-                : 'bg-gray-50 text-gray-600 hover:bg-gray-100'}`}
+            key={status}
+            onClick={() => setFilter(status)}
+            className={`
+              flex items-center space-x-2 px-5 py-2.5 rounded-lg
+              transform transition-all duration-200
+              shadow-sm hover:shadow-md
+              text-sm font-medium whitespace-nowrap
+              ${filter === status
+                ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white scale-[1.02]'
+                : 'bg-white text-gray-700 hover:bg-gray-50 hover:scale-[1.02]'
+              }
+            `}
           >
-            All Orders
+            <span>{getStatusIcon(status)}</span>
+            <span>{status.charAt(0) + status.slice(1).toLowerCase()}</span>
           </button>
-          {Object.values(OrderStatus).map((status) => (
-            <button
-              key={status}
-              onClick={() => setFilter(status)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors
-                ${filter === status 
-                  ? 'bg-gray-900 text-white' 
-                  : 'bg-gray-50 text-gray-600 hover:bg-gray-100'}`}
-            >
-              {status}
-            </button>
-          ))}
-        </div>
-      </div>
+        );
+      })}
+    </div>
+  </div>
+</div>
 
       {/* Orders List */}
       <div className="space-y-4">
