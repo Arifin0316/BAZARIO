@@ -1,11 +1,11 @@
 import Link from 'next/link';
 import { auth } from '@/auth';
-import { Facebook, Instagram, Twitter, Mail, Phone, MapPin, ExternalLink } from 'lucide-react';
+import { Facebook, Instagram, Github, Mail, Phone, MapPin, ExternalLink } from 'lucide-react';
 
 const socialLinks = [
-  { icon: Facebook, href: '#', label: 'Facebook' },
-  { icon: Instagram, href: '#', label: 'Instagram' },
-  { icon: Twitter, href: '#', label: 'Twitter' },
+  { icon: Facebook, href: 'https://www.facebook.com/profile.php?id=61550034904693', label: 'Facebook' },
+  { icon: Instagram, href: 'https://www.instagram.com/arifin0316/', label: 'Instagram' },
+  { icon: Github, href: 'https://github.com/Arifin0316', label: 'github' },
 ];
 
 const quickLinks = [
@@ -128,7 +128,7 @@ export default async function Footer() {
       <div className="py-6 border-t border-gray-200 dark:border-gray-800">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            © {new Date().getFullYear()} Bazario. All rights reserved.
+            © {new Date().getFullYear()} created by Arifin. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
             <Link 

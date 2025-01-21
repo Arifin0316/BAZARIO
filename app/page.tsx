@@ -1,12 +1,19 @@
 import Carousel from '@/components/Carousel';
 import ProductsList from '@/components/product/prodakList';
 import ProductsCatagori from '@/components/product/ProdakBCatagori';
-import c1 from "@/public/c1.jpg"
+import c1 from "@/public/c1.png"
+import c2 from "@/public/c2.jpg"
 import c3 from "@/public/c3.jpg"
 
 const carouselImages = [
   {
     src: c1,
+    alt: 'Slide 1',
+    title: 'New Arrivals',
+    description: 'Check out our latest collection'
+  },
+  {
+    src: c2,
     alt: 'Slide 1',
     title: 'New Arrivals',
     description: 'Check out our latest collection'
