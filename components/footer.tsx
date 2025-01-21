@@ -1,5 +1,7 @@
+'use client';
+
 import Link from 'next/link';
-import { auth } from '@/auth';
+import { usePathname } from 'next/navigation';
 import { Facebook, Instagram, Github, Mail, Phone, MapPin, ExternalLink } from 'lucide-react';
 
 const socialLinks = [
@@ -23,14 +25,14 @@ const supportLinks = [
 ];
 
 const contactInfo = [
-  { icon: MapPin, text: 'Jakarta, Indonesia' },
+  { icon: MapPin, text: 'malang, Indonesia' },
   { icon: Phone, text: '+62 123 456 789' },
   { icon: Mail, text: 'support@bazario.com' },
 ];
 
-export default async function Footer() {
-  const sessen = await auth()
-  if(!sessen) return null
+export default function Footer() {
+  const pathname = usePathname();
+  if(pathname === "/login" || pathname === "/register") return null;
   return (
     <footer className="bg-gray-50 dark:bg-gray-900">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -54,6 +56,7 @@ export default async function Footer() {
                   href={social.href}
                   className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transform hover:scale-110 transition-all"
                   aria-label={social.label}
+                  target='_blank'
                 >
                   <Icon size={20} />
                 </Link>
@@ -128,7 +131,7 @@ export default async function Footer() {
       <div className="py-6 border-t border-gray-200 dark:border-gray-800">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            © {new Date().getFullYear()} created by Arifin. All rights reserved.
+            © {new Date().getFullYear()} created by <Link href="https://www.instagram.com/arifin0316/" target='_blank' >Arifin.</Link> All rights reserved.
           </p>
           <div className="flex items-center gap-6">
             <Link 

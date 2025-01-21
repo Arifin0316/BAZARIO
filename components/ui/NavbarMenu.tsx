@@ -21,6 +21,7 @@ const NavbarMenu = ({ session }: NavbarClientProps) => {
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   const isActivePath = (path: string) => pathname === path;
+  if(pathname === "/login" || pathname === "/register") return null;
 
   const navLinks = [
     { href: '/', icon: Home, label: 'Home' },
