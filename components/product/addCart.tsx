@@ -8,12 +8,16 @@ import toast from 'react-hot-toast';
 import { useCart } from '@/components/cartContext';
 
 
-export default function CartButton({ product }: { product: ProdakInterface1 }) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default function CartButton({ product, session }: { product: ProdakInterface1, session: any }) {
   const [quantity] = useState(1);
   const [loading, setLoading] = useState(false);
   const { updateCart } = useCart();
 
   const handleAddToCart = async () => {
+    if(!session) {
+     return toast.error('plese login first');
+    }
     try {
       setLoading(true);
       await updateCart();

@@ -30,6 +30,7 @@ export interface Review {
 
 export interface ProdakInterface1 {
   rating?: number;
+  session?:true
   id: string;
   name: string;
   price: number;
@@ -62,21 +63,3 @@ export interface CreateOrderInput {
   shippingMethod?: string;
   shippingCost?: number;
 }
-
-
-
-// export interface ProdakInterface {
-//   id: string;
-//   name: string;
-//   price: number;
-//   description?: string;
-//   image?: string;
-//   stock: number;
-//   categoryId?: string;
-//   userId: string;
-//   createdAt: Date;
-//   updatedAt: Date;
-//   user: {
-//     name: string | null;
-//   };
-// }

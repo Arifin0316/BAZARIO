@@ -25,8 +25,8 @@ const NavbarMenu = ({ session }: NavbarClientProps) => {
 
   const navLinks = [
     { href: '/', icon: Home, label: 'Home' },
-    { href: '/cart', icon: ShoppingCart, label: 'Cart', badge: totalItems },
-    { href: '/orders', icon: Package, label: 'Orders' },
+    { href: (!session ? '/login' : '/cart'), icon: ShoppingCart, label: 'Cart', badge: totalItems },
+    { href: (!session ? '/login' : '/orders'), icon: Package, label: 'Orders' },
     ...(session ? [
       { href: '/prodak', icon: Package, label: 'Products' },
       { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },

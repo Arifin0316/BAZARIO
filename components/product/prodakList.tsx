@@ -1,3 +1,4 @@
+import { auth } from '@/auth';
 import ProductCard from '@/components/product/ProductCard';
 import { allProdak } from '@/lib/data';
 import { ProdakInterface1 } from '@/types';
@@ -5,6 +6,7 @@ import { ShoppingBag } from 'lucide-react';
 
 export default async function ProductsList() {
   const products = await allProdak() as unknown as ProdakInterface1[];
+  const session = await auth();
 
   if (!products) {
     return (
@@ -48,7 +50,7 @@ export default async function ProductsList() {
                 key={product.id} 
                 className="transform transition duration-200 hover:scale-105"
               >
-                <ProductCard product={product} />
+                <ProductCard product={product} session={session} />
               </div>
             ))}
           </div>

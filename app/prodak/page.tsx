@@ -4,6 +4,7 @@ import { ProdakInterface1 } from '@/types';
 import SearchBar from '@/components/SearchBar';
 import { ShoppingBag, Search, Package } from 'lucide-react';
 import Link from 'next/link';
+import { auth } from '@/auth';
 
 interface PageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -12,9 +13,8 @@ interface PageProps {
 export default async function ProductsPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const search = typeof params.search === 'string' ? params.search : undefined;
-  
   const products = await allProdak(search) as unknown as ProdakInterface1[];
-
+ const session = await auth();
   return (
     <div className="min-h-screen px-4 md:px-8 bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-8 flex flex-col items-center">
@@ -90,7 +90,7 @@ export default async function ProductsPage({ searchParams }: PageProps) {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {products.map((product) => (
                 <div key={product.id} className="transform transition duration-200 hover:scale-105">
-                  <ProductCard product={product} />
+                  <ProductCard product={product} session={session}/>
                 </div>
               ))}
             </div>

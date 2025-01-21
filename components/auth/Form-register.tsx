@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { SignUpCredential } from '@/lib/action';
-import { Input } from '@/components/ui/input';
+import { Input } from '@/components/ui/inputLogin';
 import { Button } from '@/components/ui/button';
 
 const FormRegister = () => {

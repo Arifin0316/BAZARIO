@@ -9,9 +9,11 @@ import { ImageOff } from 'lucide-react';
 
 interface ProductCardProps {
   product: ProdakInterface1;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  session?: any; // Replace 'any' with the appropriate type if known
 }
 
-export default function ProductCard({ product }: ProductCardProps) {
+export default function ProductCard({ product, session }: ProductCardProps) {
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -80,7 +82,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
 
         <div className="pt-2">
-          <CartButton product={product} />
+          <CartButton product={product} session={session} />
         </div>
       </div>
     </div>
