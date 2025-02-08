@@ -31,7 +31,7 @@ export default function Home() {
     <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Hero Section with Carousel */}
       <section className="relative bg-white dark:bg-gray-800 shadow-sm">
-        <div className="container mx-auto py-6 sm:py-8">
+        <div className="container mx-auto pb-6 sm:pb-8">
           <Carousel images={carouselImages} autoPlayInterval={5000} />
         </div>
       </section>

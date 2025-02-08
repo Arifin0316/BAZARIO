@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import ProductCard from '@/components/product/ProductCard';
 import { GetCategories, GetProdakByCatagoriId } from '@/lib/data';
 import { 
@@ -10,7 +11,8 @@ import {
   Sandwich,
   Crown,
   LucideIcon,
-  PackageOpen
+  PackageOpen,
+  Loader2
 } from 'lucide-react';
 
 // Type definition for category configuration
@@ -53,10 +55,38 @@ const defaultConfig: CategoryConfig = {
   gradient: 'from-gray-500 to-gray-700'
 };
 
+// Loader Component
+const ProductLoader = () => (
+  <div className="col-span-full flex flex-col items-center justify-center py-12">
+    <motion.div 
+      animate={{ 
+        rotate: 360,
+        scale: [1, 1.2, 1]
+      }}
+      transition={{ 
+        duration: 1.5,
+        repeat: Infinity,
+        ease: "easeInOut"
+      }}
+    >
+      <Loader2 className="w-16 h-16 text-blue-500 mb-4" />
+    </motion.div>
+    <motion.p 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay: 0.3 }}
+      className="text-gray-500 text-lg text-center"
+    >
+      Memuat produk...
+    </motion.p>
+  </div>
+);
+
 export default function ProductsCategory() {
   const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [products, setProducts] = useState<{ id: string; name: string; price: number; createdAt: Date; updatedAt: Date; userId: string; categoryId: string | null; description: string | null; image: string | null; stock: number; user: { id: string; name: string; } }[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -80,15 +110,22 @@ export default function ProductsCategory() {
     if (!activeCategory) return;
 
     const fetchProducts = async () => {
+      setIsLoading(true);
       try {
         const category = await GetProdakByCatagoriId(activeCategory);
         const productsWithUser = category?.prodaks.map((product) => ({
           ...product,
           user: { id: product.userId, name: 'User Name' }
         })) || [];
+        
+        // Menambahkan delay artifisial untuk menunjukkan animasi loading
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
         setProducts(productsWithUser);
       } catch (error) {
         console.error('Error fetching products:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -109,17 +146,19 @@ export default function ProductsCategory() {
             const Icon = config.icon;
             
             return (
-              <button
+              <motion.button
                 key={category.id}
                 onClick={() => handleCategoryClick(category.id)}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 className={`
                   flex items-center space-x-2 px-6 py-3 rounded-lg
                   transform transition-all duration-200
                   shadow-md hover:shadow-lg
                   text-sm md:text-base
                   ${activeCategory === category.id
-                    ? `bg-gradient-to-r ${config.gradient} text-white scale-105`
-                    : 'bg-white text-gray-700 hover:scale-105'
+                    ? `bg-gradient-to-r ${config.gradient} text-white`
+                    : 'bg-white text-gray-700'
                   }
                 `}
               >
@@ -129,27 +168,55 @@ export default function ProductsCategory() {
                   }`} 
                 />
                 <span className="font-medium">{category.name}</span>
-              </button>
+              </motion.button>
             );
           })}
         </div>
       </div>
 
-      {/* Products Grid */}
-      <div className="grid mt-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {products.length > 0 ? (
-          products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))
+      {/* Products Grid with Animated Loading */}
+      <AnimatePresence mode="wait">
+        {isLoading ? (
+          <motion.div 
+            key="loader"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="grid mt-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+          >
+            <ProductLoader />
+          </motion.div>
         ) : (
-          <div className="col-span-full flex flex-col items-center justify-center py-12">
-            <ShoppingBag className="w-16 h-16 text-gray-400 mb-4" />
-            <p className="text-gray-500 text-lg text-center">
-              No products available in this category.
-            </p>
-          </div>
+          <motion.div 
+            key="products"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+            className="grid mt-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+          >
+            {products.length > 0 ? (
+              products.map((product) => (
+                <motion.div
+                  key={product.id}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <ProductCard product={product} />
+                </motion.div>
+              ))
+            ) : (
+              <div className="col-span-full flex flex-col items-center justify-center py-12">
+                <ShoppingBag className="w-16 h-16 text-gray-400 mb-4" />
+                <p className="text-gray-500 text-lg text-center">
+                  Tidak ada produk dalam kategori ini.
+                </p>
+              </div>
+            )}
+          </motion.div>
         )}
-      </div>
+      </AnimatePresence>
     </div>
   );
 }
